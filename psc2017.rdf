@@ -5,8 +5,6 @@
 	xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
 	xmlns:skos="http://www.w3.org/2004/02/skos/core#"
 	xmlns:gn="http://www.geonames.org/ontology#"
-	xmlns:j.0="http://w3c/future-csv-vocab/"
-	xmlns:j.1="file:///Users/amonrhaniery/eclipse-workspace/hierarquiaurbana/input/psc2017.csv#"
 	xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
 	xmlns:sdmx-dimension="http://purl.org/linked-data/sdmx/2009/dimension#"
 	xmlns:sdmx-measure="http://purl.org/linked-data/sdmx/2009/measure#"

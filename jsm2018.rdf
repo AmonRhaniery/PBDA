@@ -3,8 +3,6 @@
 	xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
 	xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
 	xmlns:skos="http://www.w3.org/2004/02/skos/core#"
-	xmlns:j.0="http://w3c/future-csv-vocab/"
-	xmlns:j.1="file:///Users/amonrhaniery/eclipse-workspace/hierarquiaurbana/input/jsm2018.csv#"
 	xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
 	xmlns:org="http://www.w3.org/ns/org#"
 	xmlns:vcard="http://www.w3.org/2006/vcard/ns#"
