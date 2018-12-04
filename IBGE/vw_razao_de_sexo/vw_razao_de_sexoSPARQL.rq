@@ -1,0 +1,88 @@
+PREFIX ds: <http://dados.gov.br/dataset/cgeo_vw_razao_de_sexo> 
+PREFIX RDF: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> 
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX ibge: <https://metadados.ibge.gov.br/#> 
+PREFIX gn: <http://www.geonames.org/ontology#> 
+PREFIX ogc: <http://www.opengis.net/rdf#> 
+PREFIX j.0: <http://w3c/future-csv-vocab/> 
+PREFIX j.1: <file:///Users/amonrhaniery/eclipse-workspace/hierarquiaurbana/input/vw_razao_de_sexo.csv#>
+PREFIX sdmx-dimension: <http://purl.org/linked-data/sdmx/2009/dimension#>
+PREFIX sdmx-measure: <http://purl.org/linked-data/sdmx/2009/measure#>
+PREFIX sdmx-concept: <http://purl.org/linked-data/sdmx/2009/concept#>
+PREFIX qb: <http://purl.org/linked-data/cube#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
+CONSTRUCT {
+    ?refCidade a qb:DimensionProperty;
+        rdfs:subPropertyOf sdmx-dimension:refArea;
+        qb:concept sdmx-concept:refArea;
+        rdfs:range gn:P.
+
+    ?dsPopMasc a qb:MeasureProperty;
+        rdfs:subPropertyOf sdmx-measure:obsValue;
+        rdfs:label "População Masculina"@pt;
+        rdfs:label "Male Population"@en;
+        rdfs:range xsd:decimal.
+
+    ?dsPopFem a qb:MeasureProperty;
+        rdfs:subPropertyOf sdmx-measure:obsValue;
+        rdfs:label "População Feminina"@pt;
+        rdfs:label "Female Population"@en;
+        rdfs:range xsd:decimal.
+
+    ?dsRazaoDeSexo a qb:MeasureProperty;
+        rdfs:subPropertyOf sdmx-measure:obsValue;
+        rdfs:label "Razão de Sexo"@pt;
+        rdfs:label "Ratio between genders"@en;
+        rdfs:range xsd:decimal.
+
+    ?componente qb:measure ?dsPopMasc;
+     qb:measure ?dsPopFem ;
+      qb:measure ?dsRazaoDeSexo ;
+        qb:dimension sdmx-dimension:refPeriod ;
+        qb:dimension ?refCidade .
+
+    ?dsd a qb:DataStructureDefinition;
+        qb:component ?componente.
+
+    ?vw_razao_de_sexo a qb:DataSet;
+        rdfs:label "Razão entre o número de homens e mulheres em uma população"@pt;
+        rdfs:label "Ratio between male and female in a population"@en;
+        rdfs:comment "Razão entre o número de homens e o número de mulheres em uma população, na data de referência do Censo Demográfico. Fonte: IBGE, Censo Demográfico 2010 e Malha municipal 2010."@pt ;
+        qb:structure ?dsd.
+
+    ?row a qb:Observation ;
+        ds:PopMasc ?Populaca_Masculina;
+        ds:PopFem ?Populacao_Feminina;
+        qb:dataSet ?vw_razao_de_sexo;
+        sdmx-dimension:refPeriod ?year ;
+        ds:RazaoDeSexo ?Razao_de_Sexo;
+        ds:refCidade ?city.
+        
+        ?city a gn:P;
+            a ogc:Polygon;
+            gn:name ?nome;
+            gn:parentADM1 ?UF;
+            ogc:awSKT ?the_geom2;
+            ibge:classeRazaoDeSexo ?classe .
+        
+} WHERE {
+?row j.1:nome ?nome;
+    j.1:UF ?UF ;
+    j.1:Populacao_Feminina ?Populaca_Masculina ;
+    j.1:Populacao_Feminina ?Populacao_Feminina ;
+    j.1:Razao_de_Sexo ?Razao_de_Sexo;
+    j.1:classe ?classe ;
+    j.1:geom ?the_geom .
+    BIND(STRDT(STR(?the_geom), <http://www.opengis.net/rdf#WKTLiteral>) AS ?the_geom2)
+    BIND(ENCODE_FOR_URI( STR( ?nome ) ) AS ?nome2)
+    BIND(URI(CONCAT("https://cidades.ibge.gov.br/#", STR( ?nome2 )))  AS ?city)
+    BIND(URI("http://dados.gov.br/dataset/cgeo_vw_razao_de_sexo#dsd") AS ?dsd)
+    BIND(URI("http://dados.gov.br/dataset/cgeo_vw_razao_de_sexo#componente") AS ?componente)
+    BIND(URI("http://dados.gov.br/dataset/cgeo_vw_razao_de_sexo") AS ?vw_razao_de_sexo)
+    BIND(URI(CONCAT("http://dados.gov.br/dataset/cgeo_vw_razao_de_sexo#", "classe"))  AS ?dsclasse)
+    BIND(URI(CONCAT("http://dados.gov.br/dataset/cgeo_vw_razao_de_sexo#", "PopMasc"))  AS ?dsPopMasc)
+    BIND(URI(CONCAT("http://dados.gov.br/dataset/cgeo_vw_razao_de_sexo#", "PopFem"))  AS ?dsPopFem)
+    BIND(URI(CONCAT("http://dados.gov.br/dataset/cgeo_vw_razao_de_sexo#", "RazaoDeSexo"))  AS ?dsRazaoDeSexo)
+    BIND(URI(CONCAT("http://dados.gov.br/dataset/cgeo_vw_razao_de_sexo#", "refCidade"))  AS ?refCidade)
+}

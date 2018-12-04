@@ -1,0 +1,84 @@
+PREFIX RDF: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> 
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX ibge: <https://metadados.ibge.gov.br/#> 
+PREFIX gn: <http://www.geonames.org/ontology#> 
+PREFIX ogc: <http://www.opengis.net/rdf#> 
+PREFIX j.0: <http://w3c/future-csv-vocab/> 
+PREFIX j.1: <file:///Users/amonrhaniery/eclipse-workspace/hierarquiaurbana/input/RedeUrbanaSintese_Regic2007.csv#> 
+CONSTRUCT { ?row2 a ibge:Cidade ;
+			  ibge:codmun ?cod_origem ;
+			  gn:name ?nome_orige ;
+			  ogc:asWKT ?the_geom2 ;
+			  a ogc:MultiLineString;									 	
+			  ibge:destRegic ?destRegic;
+			  ibge:inRegic ?firstRegic ;
+			  ibge:inRegic ?secondRegic ;
+			  ibge:inRegic ?thirdRegic ;
+			  ibge:inRegic ?fourthRegic ;
+			  ibge:inRegic ?fifthRegic ;
+			  ibge:inRegic ?sixthRegic ;
+    			ibge:classeRegic [ibge:nivelRegic ?nivel_orig; rdfs:label ?classe_ori ] .
+			  ?firstRegic a ibge:Cidade;
+			  	ibge:nivelRegic ?nivel_s1;
+			 		gn:name ?nome_s1;
+			 		ibge:codmun ?cod_s1 .
+			  ?secondRegic a ibge:Cidade;
+			  	ibge:nivelRegic ?nivel_s2;
+			 		gn:name ?nome_s2;
+			 		ibge:codmun ?cod_s2 .
+			  ?thirdRegic a ibge:Cidade;
+			  	ibge:nivelRegic ?nivel_s3;
+			 		gn:name ?nome_s3;
+			 		ibge:codmun ?cod_s3 .
+			  ?fourthRegic a ibge:Cidade;
+			  	ibge:nivelRegic ?nivel_s4;
+			 		gn:name ?nome_s4;
+			 		ibge:codmun ?cod_s4 .
+			  ?fifthRegic a ibge:Cidade;
+			  	ibge:nivelRegic ?nivel_s5;
+			 		gn:name ?nome_s5;
+			 		ibge:codmun ?cod_s5 .
+			  ?sixthRegic a ibge:Cidade;
+			  	ibge:nivelRegic ?nivel_s6;
+			 		gn:name ?nome_s6;
+			 		ibge:codmun ?cod_s6 .
+			  ?destRegic a ibge:Cidade ;
+			 		gn:name ?nome_desti ;
+			 		ibge:classeRegic [ ibge:nivelRegic ?nivel_dest ; rdfs:label ?classe_des ].
+			  } 
+WHERE { ?row j.1:cod_origem ?cod_origem ;
+j.1:nome_orige ?nome_orige ;
+j.1:nivel_orig ?nivel_orig ;
+j.1:classe_ori ?classe_ori ;
+j.1:cod_destin ?cod_destin ;
+j.1:nome_desti ?nome_desti ;
+j.1:classe_des ?classe_des ;
+j.1:nivel_dest ?nivel_dest ;
+j.1:the_geom ?the_geom .
+	OPTIONAL { ?row j.1:cod_s1 ?cod_s1}
+	OPTIONAL { ?row j.1:cod_s2 ?cod_s2}
+	OPTIONAL { ?row j.1:cod_s3 ?cod_s3}
+	OPTIONAL { ?row j.1:cod_s4 ?cod_s4}
+	OPTIONAL { ?row j.1:cod_s5 ?cod_s5}
+	OPTIONAL { ?row j.1:cod_s6 ?cod_s6}
+	OPTIONAL { ?row j.1:nome_s1 ?nome_s1}
+	OPTIONAL { ?row j.1:nome_s2 ?nome_s2}
+	OPTIONAL { ?row j.1:nome_s3 ?nome_s3}
+	OPTIONAL { ?row j.1:nome_s4 ?nome_s4}
+	OPTIONAL { ?row j.1:nome_s5 ?nome_s5}
+	OPTIONAL { ?row j.1:nome_s6 ?nome_s6}
+	OPTIONAL { ?row j.1:nivel_s1 ?nivel_s1}
+	OPTIONAL { ?row j.1:nivel_s2 ?nivel_s2}
+	OPTIONAL { ?row j.1:nivel_s3 ?nivel_s3}
+	OPTIONAL { ?row j.1:nivel_s4 ?nivel_s4}
+	OPTIONAL { ?row j.1:nivel_s5 ?nivel_s5}
+	OPTIONAL { ?row j.1:nivel_s6 ?nivel_s6}
+BIND(STRDT(STR(?the_geom), <http://www.opengis.net/rdf#WKTLiteral>) AS ?the_geom2)
+BIND(URI(CONCAT("https://cidades.ibge.gov.br/#", STR( ?cod_destin )))  AS ?destRegic)
+BIND(URI(CONCAT("https://cidades.ibge.gov.br/#", STR( ?cod_s1 )))  AS ?firstRegic)
+BIND(URI(CONCAT("https://cidades.ibge.gov.br/#", STR( ?cod_s2 )))  AS ?secondRegic)
+BIND(URI(CONCAT("https://cidades.ibge.gov.br/#", STR( ?cod_s3 )))  AS ?thirdRegic)
+BIND(URI(CONCAT("https://cidades.ibge.gov.br/#", STR( ?cod_s4 )))  AS ?fourthRegic)
+BIND(URI(CONCAT("https://cidades.ibge.gov.br/#", STR( ?cod_s5 )))  AS ?fifthRegic)
+BIND(URI(CONCAT("https://cidades.ibge.gov.br/#", STR( ?cod_s6 )))  AS ?sixthRegic) 
+BIND(URI(CONCAT("https://cidades.ibge.gov.br/#", STR( ?cod_origem )))  AS ?row2)}

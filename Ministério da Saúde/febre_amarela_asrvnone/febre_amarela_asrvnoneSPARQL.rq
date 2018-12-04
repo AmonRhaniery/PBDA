@@ -1,0 +1,44 @@
+PREFIX ds: <http://dados.gov.br/dataset/febre_amarela_asrvnone#> 
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> 
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX ibge: <https://metadados.ibge.gov.br/#> 
+PREFIX gn: <http://www.geonames.org/ontology#> 
+PREFIX j.0: <http://w3c/future-csv-vocab/> 
+PREFIX j.1: <file:///Users/amonrhaniery/eclipse-workspace/hierarquiaurbana/input/febre_amarela_asrvnone.csv#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX obo: <http://purl.obolibrary.org/obo/>
+PREFIX dcat: <http://www.w3.org/ns/dcat#>
+
+CONSTRUCT {
+
+    ?dataset a dcat:Dataset;
+        dcat:landingPage ?uri;
+        dcat:distribution ?csv ;
+        rdfs:label "Área sem recomendação de vacina - Febre Amarela"@pt;
+        rdfs:label "Area without vaccine recommendation - Yellow Fever"@en;
+        rdfs:comment "Descrição: O mapa mostra os municípios onde não há recomendação da vacinação contra febre amarela Nível de Agregação: Município Periodicidade de Atualização: Anual Método de Cálculo: Número de municípios sem recomendação de vacina"@pt .
+
+    ?csv a dcat:Distribution;
+        dcat:downloadURL ?downuri;
+        dcat:mediaType "text/csv" .
+
+    ?dsneednotVaccine a rdf:Property;
+        rdfs:domain ibge:Cidade ;
+        rdfs:label "Município sem recomendação de vacina."@pt;
+        rdfs:label "City without vaccine recommendation"@en ;
+        rdfs:range obo:VO_0000001.
+
+     ?city a ibge:Cidade ;
+        gn:name ?no_cidade ;
+        ds:noNeedVaccine obo:VO_0000123 .
+        
+} WHERE {
+    ?row j.1:no_cidade ?no_cidade .
+    BIND(URI("http://dados.gov.br/dataset/febre_amarela_asrv")AS ?dataset)
+    BIND(URI("http://dados.gov.br/dataset/febre_amarela_asrv#csv")AS ?csv)
+    BIND(URI("http://dados.gov.br/dataset/febre_amarela_asrv")AS ?uri)
+    BIND(URI("http://i3geo.saude.gov.br/i3geo/ogc.php?service=WFS&version=1.0.0&request=GetFeature&typeName=febre_amarela_asrv&outputFormat=CSV")AS ?downuri)
+    BIND(ENCODE_FOR_URI( STR( ?no_cidade ) ) AS ?nome2)
+    BIND(URI(CONCAT("https://cidades.ibge.gov.br/#", STR( ?nome2 )))  AS ?city)
+    BIND(URI(CONCAT("http://dados.gov.br/dataset/febre_amarela_asrvnone#", "noNeedVaccine"))  AS ?dsneednotVaccine)
+}

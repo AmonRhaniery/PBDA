@@ -1,0 +1,43 @@
+PREFIX ds: <http://dados.gov.br/dataset/sorridente_lpdr_2013#> 
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX ibge: <https://metadados.ibge.gov.br/#> 
+PREFIX gn: <http://www.geonames.org/ontology#> 
+PREFIX j.0: <http://w3c/future-csv-vocab/> 
+PREFIX j.1: <file:///Users/amonrhaniery/eclipse-workspace/hierarquiaurbana/input/sorridente_lpdr_2013none.csv#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX dcat: <http://www.w3.org/ns/dcat#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+CONSTRUCT {
+
+    ?csv a dcat:Distribution;
+        dcat:downloadURL ?downuri;
+        dcat:mediaType "text/csv" .
+
+    ?dataset a dcat:Dataset;
+        dcat:landingPage ?uri;
+        dcat:distribution ?csv ;
+        rdfs:label "Municípios com Laboratórios de Próteses Dentárias - 2013"@pt;
+        rdfs:label "Cities with dental prostheses laboratories - 2013"@en;
+        rdfs:comment "O programa Brasil Sorridente está inserido na Estratégia Saúde da Família (Esf) e tem como objetivo garantir as ações depromoção, prevenção e recuperação da saúde bucal dos brasileiros. O tratamento é oferecido pelos Centros de EspecialidadesOdontológicas. Além da implantação de CEOs, há também a implantação de Laboratórios de Prótese Dentária – LPD – que sãounidades próprias do município ou unidades terceirizadas credenciadas para confecção de próteses totais, próteses parciaisremovíveis e próteses.Interpretação: Laboratórios de próteses dentárias cujos projetos enviados pelos municípios foram aprovados pelo MS. Nível de Agregação: Município Periodicidade de Atualização: Mensal. Método de Cálculo: Número absoluto de laboratórios de próteses dentárias habilitadas"@pt .
+
+    ?dsmunProtDent a rdf:Property;
+        rdfs:domain ibge:Cidade ;
+        rdfs:label "Municípios com Laboratórios de Próteses Dentárias - 2013."@pt;
+        rdfs:label "Cities with dental prostheses laboratories - 2013"@en;
+        rdfs:range xsd:integer.
+
+     ?city a ibge:Cidade ;
+        gn:name ?no_cidade ;
+        ds:qtdLabProtDent ?total .
+        
+} WHERE {
+    ?row j.1:no_cidade ?no_cidade ;
+        j.1:total ?total.
+    BIND(ENCODE_FOR_URI( STR( ?no_cidade ) ) AS ?nome2)
+    BIND(URI(CONCAT("https://cidades.ibge.gov.br/#", STR( ?nome2 )))  AS ?city)
+    BIND(URI("http://dados.gov.br/dataset/sorridente_lpdr_2013")AS ?uri)
+    BIND(URI("http://dados.gov.br/dataset/sorridente_lpdr_2013#csv")AS ?csv)
+    BIND(URI("http://i3geo.saude.gov.br/i3geo/ogc.php?service=WFS&version=1.0.0&request=GetFeature&typeName=sorridente_lpdr_2013&outputFormat=CSV")AS ?downuri)
+    BIND(URI("http://dados.gov.br/dataset/sorridente_lpdr_2013")AS ?dataset)
+    BIND(URI(CONCAT("http://dados.gov.br/dataset/sorridente_lpdr_2013#", "qtdLabProtDent"))  AS ?dsmunProtDent )
+}

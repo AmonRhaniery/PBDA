@@ -1,0 +1,80 @@
+PREFIX ds: <http://dados.gov.br/dataset/cgeo_vw_pib_percapita> 
+PREFIX RDF: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> 
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX ibge: <https://metadados.ibge.gov.br/#> 
+PREFIX gn: <http://www.geonames.org/ontology#> 
+PREFIX ogc: <http://www.opengis.net/rdf#> 
+PREFIX j.0: <http://w3c/future-csv-vocab/> 
+PREFIX j.1: <file:///Users/amonrhaniery/eclipse-workspace/hierarquiaurbana/input/vw_pib_percapita.csv#>
+PREFIX sdmx-dimension: <http://purl.org/linked-data/sdmx/2009/dimension#>
+PREFIX sdmx-measure: <http://purl.org/linked-data/sdmx/2009/measure#>
+PREFIX sdmx-concept: <http://purl.org/linked-data/sdmx/2009/concept#>
+PREFIX qb: <http://purl.org/linked-data/cube#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
+CONSTRUCT {
+    ?refCidade a qb:DimensionProperty;
+        rdfs:subPropertyOf sdmx-dimension:refArea;
+        qb:concept sdmx-concept:refArea;
+        rdfs:range gn:P.
+
+    ?PIBPercapita a qb:MeasureProperty;
+        rdfs:subPropertyOf sdmx-measure:obsValue;
+        rdfs:label "PIB per capita"@pt;
+        rdfs:label "GDP per capita"@en;
+        rdfs:range xsd:decimal.
+
+    ?dsPIB a qb:MeasureProperty;
+        rdfs:subPropertyOf sdmx-measure:obsValue;
+        rdfs:label "Produto Interno Bruto"@pt;
+        rdfs:label "Gross Domestic Product"@en;
+        rdfs:range xsd:decimal.
+
+    ?componente qb:measure ?PIBPercapita ;
+     qb:measure ?dsPIB ;
+     qb:dimension sdmx-dimension:refPeriod ;
+    qb:dimension ?refCidade.
+
+    ?dsd a qb:DataStructureDefinition;
+        qb:component ?componente.
+
+    ?vw_pib_percapita a qb:DataSet;
+        rdfs:label "Produto Interno Bruto por municipio"@pt;
+        rdfs:label "Gross Domestic Product per city"@en;
+        rdfs:comment "O Produto Interno Bruto - PIB per capita de cada município foi estimado pelo quociente entre o valor do PIB do municípioe sua população residente. Para a população, foi utilizada a estimativa encaminhada pelo IBGE ao Tribunal de Contas da União- TCU, em outubro de 2009, tendo 1º de julho de 2009 como data de referência.Produto interno bruto é o total dos bens e serviços produzidos pelas unidades produtoras residentes destinados ao consumofinal sendo, portanto, equivalente à soma dos valores adicionados pelas diversas atividades econômicas acrescida dos impostos,líquidos de subsídios, sobre produtos. O produto interno bruto também é equivalente à soma dos consumos finais de bense serviços valorados a preço de mercado sendo, também, equivalente à soma das rendas primárias.Fonte: IBGE, Produto Interno Bruto dos Municípios 2005-2009, Estimativas populacionais para os municípios brasileiros - 2009e Malha municipal 2010."@pt ;
+        qb:structure ?dsd.
+
+    ?row a qb:Observation ;
+        ds:PIB ?PIB;
+        qb:dataSet ?vw_pib_percapita;
+        sdmx-dimension:refPeriod ?year ;
+        ds:PIBPercapita ?PIB_percapita;
+        ds:refCidade ?city.
+        
+        ?city a gn:P;
+            a ogc:Polygon;
+            gn:name ?nome;
+            gn:population ?Pop_est_2009;
+            gn:parentADM1 ?UF;
+            ogc:awSKT ?the_geom2;
+            ibge:classePIBPercapita ?classe .
+        
+} WHERE {
+?row j.1:nome ?nome;
+    j.1:UF ?UF ;
+    j.1:Pop_est_2009 ?Pop_est_2009T ;
+    j.1:PIB ?PIB ;
+    j.1:PIB_percapita ?PIB_percapita;
+    j.1:classe ?classe ;
+    j.1:geom ?the_geom .
+    BIND(STRDT(STR(?the_geom), <http://www.opengis.net/rdf#WKTLiteral>) AS ?the_geom2)
+    BIND(ENCODE_FOR_URI( STR( ?nome ) ) AS ?nome2)
+    BIND(URI(CONCAT("https://metadados.ibge.gov.br/#", STR( ?nome2 )))  AS ?city)
+    BIND(URI("http://dados.gov.br/dataset/cgeo_vw_pib_percapita#dsd") AS ?dsd)
+    BIND(URI("http://dados.gov.br/dataset/cgeo_vw_pib_percapita#componente") AS ?componente)
+    BIND(URI("http://dados.gov.br/dataset/cgeo_vw_pib_percapita") AS ?vw_pib_percapita)
+    BIND(URI(CONCAT("http://dados.gov.br/dataset/cgeo_vw_pib_percapita#", "classe"))  AS ?dsclasse)
+    BIND(URI(CONCAT("http://dados.gov.br/dataset/cgeo_vw_pib_percapita#", "PIB"))  AS ?dsPIB)
+    BIND(URI(CONCAT("http://dados.gov.br/dataset/cgeo_vw_pib_percapita#", "PIBPercapita"))  AS ?PIBPercapita)
+    BIND(URI(CONCAT("http://dados.gov.br/dataset/cgeo_vw_pib_percapita#", "refCidade"))  AS ?refCidade)
+}

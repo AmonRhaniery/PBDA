@@ -1,0 +1,110 @@
+PREFIX ds: <http://dados.gov.br/dataset/projeto-soldado-cidadao#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> 
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX gn: <http://www.geonames.org/ontology#> 
+PREFIX j.0: <http://w3c/future-csv-vocab/> 
+PREFIX j.1: <file:///Users/amonrhaniery/eclipse-workspace/hierarquiaurbana/input/psc2016.csv#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX sdmx-dimension: <http://purl.org/linked-data/sdmx/2009/dimension#>
+PREFIX sdmx-measure: <http://purl.org/linked-data/sdmx/2009/measure#>
+PREFIX sdmx-concept: <http://purl.org/linked-data/sdmx/2009/concept#>
+PREFIX sdmx-code: <http://purl.org/linked-data/sdmx/2009/code#>
+PREFIX qb: <http://purl.org/linked-data/cube#>
+PREFIX org: <http://www.w3.org/ns/org#>
+PREFIX vcard: <http://www.w3.org/2006/vcard/ns#>
+PREFIX dcat: <http://www.w3.org/ns/dcat#>
+PREFIX vivo: <http://vivoweb.org/ontology/core#>
+PREFIX obo: <http://purl.obolibrary.org/obo/>
+PREFIX event:<http://purl.org/NET/c4dm/event.owl#>
+PREFIX teach: <http://linkedscience.org/teach/ns#>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX mil: <http://rdf.muninn-project.org/ontologies/military#>
+
+CONSTRUCT {
+
+    ?dataset a dcat:Dataset;
+        dcat:landingPage ?uri;
+        dcat:distribution ?csv;
+        rdfs:label "Projeto Soldado Cidadão 2016"@pt;
+        rdfs:comment "O Projeto Soldado Cidadão tem a missão de qualificar profissionalmente os recrutas que prestam o Serviço Militar, complementando sua formação cívica-cidadã e facilitando seu ingresso no mercado de trabalho, após o período obrigatório junto às Forças Armadas. O programa funciona desde 2004 e abrange todo o território nacional. Escolas técnicas e militares são parceiras na capacitação dos jovens que estão deixando a farda para retornar à vida civil. Quase 200 mil jovens já foram beneficiados pelo Soldado Cidadão, que oferece cursos em conformidade com a demanda do mercado de trabalho regional. Entre as áreas de qualificação disponibilizadas aos recrutas estão: telecomunicações, mecânica, alimentação, construção civil, artes gráficas, confecção, têxtil, eletricidade, comércio, comunicação, transportes, infor­mática, vigilância, pintura e saúde. O presente conjunto apresenta os dados referentes ao Projeto Soldado-Cidadão (PSC), previsto no Plano Plurianual 2016/2019, por intermédio da Ação 6557, para qualificação profissional de militares temporários das Forças Armadas. As informações constam dos relatórios finais do Exército Brasileiro (EB) ao Ministério da Defesa (MD) nos últimos 3 (três) anos de Projeto, contendo o número de beneficiários por ano, os cursos realizados, os Comandos Militares de Área participantes, bem como as Unidades da Federação e os Municípios abrangidos pelo Projeto."@pt ;
+        qb:structure ?dsd.
+
+    ?csv a dcat:Distribution;
+        dcat:downloadURL ?downuri;
+        dcat:mediaType "text/csv" .
+
+    ?dsStartedWith a rdf:Property;
+        rdfs:label "Efetivo inicial"@pt;
+        rdfs:range xsd:integer.
+    ?dsEndedWith a rdf:Property;
+        rdfs:label "Efetivo final"@pt;
+        rdfs:range xsd:integer.
+    ?dsHasPrice a rdf:Property;
+        rdfs:label "Valor total do curso"@pt;
+        rdfs:range xsd:decimal.
+    ?dsHasPricePerClass a rdf:Property;
+        rdfs:label "Valor da hora aula"@pt;
+        rdfs:range xsd:decimal.
+
+    ?intervalo a vivo:dateTimeInterval;
+        vivo:start ?inicio2;
+        vivo:end ?termino2 .      
+
+    ?entidade2 a obo:ERO_0000225;
+        a foaf:Organization;
+        foaf:name ?ENTIDADE.
+
+    ?lugar a vivo:Location;
+        vcard:hasAddress ?LOCAL;
+        vcard:hasLocality ?MUNICIPIO;
+        vcard:hasregion ?UF.
+
+    ?cmarea a mil:ArmyGroup;
+        skos:prefLabel ?CMD_MIL_AREA;
+        rdfs:seeAlso <http://www.sgex.eb.mil.br/sistemas/organograma/organograma_exercito.php> .
+
+    ?course a vivo:Course ;
+        a teach:Course;
+        teach:weeklyHouse ?CARGA_HORARIA;
+        vivo:dateTimeInterval ?intervalo;
+        obo:ERO_0001521 ?entidade2;
+        obo:BFO_0000054 ?lugar;
+        vivo:supportedBy ?cmarea ;
+        teach:hasTitle ?CURSO;
+        vivo:hasSubjectArea ?CURSO;
+        ds:startedWith ?EFETIVO_INICIAL;
+        ds:endedWith ?EFETIVO_FINAL;
+        ds:hasPricePerClass ?VALOR_HORA_AULA;
+        ds:hasPrice ?VALOR_TOTAL.
+        
+} WHERE {
+    ?row j.1:CMD_MIL_AREA ?CMD_MIL_AREA ;
+        j.1:UF ?UF;
+        j.1:MUNICIPIO ?MUNICIPIO;
+        j.1:ENTIDADE ?ENTIDADE ;
+        j.1:CURSO ?CURSO ;
+        j.1:LOCAL ?LOCAL;
+        j.1:INICIO ?INICIO;
+        j.1:TERMINO ?TERMINO;
+        j.1:CARGA_HORARIA ?CARGA_HORARIA;
+        j.1:EFETIVO_FINAL ?EFETIVO_FINAL;
+        j.1:EFETIVO_INICIAL ?EFETIVO_INICIAL;
+        j.1:VALOR_HORA_AULA ?VALOR_HORA_AULA;
+        j.1:VALOR_TOTAL ?VALOR_TOTAL.
+    BIND(BNODE()  AS ?course)
+    BIND(STRDT(STR(?INICIO), <http://vivoweb.org/ontology/core#DateTimeValue>) AS ?inicio2)
+    BIND(STRDT(STR(?TERMINO), <http://vivoweb.org/ontology/core#DateTimeValue>) AS ?termino2)
+    BIND(URI("http://dados.gov.br/dataset/projeto-soldado-cidadao")AS ?uri)
+    BIND(URI("http://dados.gov.br/dataset/projeto-soldado-cidadao")AS ?dataset)
+    BIND(URI("http://dados.gov.br/dataset/projeto-soldado-cidadao#csv")AS ?csv)
+    BIND(BNODE() AS ?intervalo)
+    BIND(BNODE() AS ?cmarea)
+    BIND(BNODE() AS ?lugar)
+    BIND(BNODE() AS ?entidade2)
+    BIND(URI("http://dadosabertos.eb.mil.br/arquivos/soldado-cidadao/psc2017.csv")AS ?downuri)
+    BIND(URI(CONCAT("http://dados.gov.br/dataset/projeto-soldado-cidadao#", "startedWith"))  AS ?dsStartedWith)
+    BIND(URI(CONCAT("http://dados.gov.br/dataset/projeto-soldado-cidadao#", "endedWith"))  AS ?dsEndedWith)
+    BIND(URI(CONCAT("http://dados.gov.br/dataset/projeto-soldado-cidadao#", "hasPricePerClass"))  AS ?dsHasPricePerClass)
+    BIND(URI(CONCAT("http://dados.gov.br/dataset/projeto-soldado-cidadao#", "hasPrice"))  AS ?dsHasPrice)
+}

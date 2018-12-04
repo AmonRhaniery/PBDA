@@ -1,0 +1,80 @@
+PREFIX ds: <http://dados.gov.br/dataset/odm6_malaria#> 
+PREFIX RDF: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> 
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX ibge: <https://metadados.ibge.gov.br/#> 
+PREFIX gn: <http://www.geonames.org/ontology#> 
+PREFIX obo: <http://purl.obolibrary.org/obo/>
+PREFIX j.0: <http://w3c/future-csv-vocab/> 
+PREFIX j.1: <file:///Users/amonrhaniery/eclipse-workspace/hierarquiaurbana/input/odm6_malarianone.csv#>
+PREFIX sdmx-dimension: <http://purl.org/linked-data/sdmx/2009/dimension#>
+PREFIX sdmx-measure: <http://purl.org/linked-data/sdmx/2009/measure#>
+PREFIX sdmx-concept: <http://purl.org/linked-data/sdmx/2009/concept#>
+PREFIX qb: <http://purl.org/linked-data/cube#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX dcat: <http://www.w3.org/ns/dcat#>
+
+CONSTRUCT {
+
+    ?refCidade a qb:DimensionProperty;
+        rdfs:subPropertyOf sdmx-dimension:refArea;
+        qb:concept sdmx-concept:refArea;
+        rdfs:range gn:P.
+
+    ?dsDoenca a qb:DimensionProperty;
+        qb:concept <http://vocabularies.unesco.org/thesaurus/concept8188>;
+        rdfs:label "Doença"@pt;
+        rdfs:label "Disease"@en;
+        rdfs:range obo:DOID_4.
+
+    ?dsTaxa a qb:MeasureProperty;
+        rdfs:subPropertyOf sdmx-measure:obsValue;
+        rdfs:label "Número de exames positivos de malária (códigos B50 a B53 da CID-10) por mil habitantes"@pt;
+        rdfs:label "Number of Malaria positive exams per 1000 inhabitants"@en;
+        rdfs:range xsd:decimal.
+
+    ?componente qb:measure ?dsTaxa;
+         qb:dimension ?dsDoenca ;
+          qb:dimension sdmx-dimension:refPeriod ;
+           qb:dimension ?refCidade.
+
+    ?dsd a qb:DataStructureDefinition;
+        qb:component ?componente.
+    
+    ?csv a dcat:Distribution;
+        dcat:downloadURL ?downuri;
+        dcat:mediaType "text/csv" .
+
+    ?odm6_malaria a qb:DataSet;
+        rdfs:label "Índice Parasitário anual de Malária"@pt;
+        rdfs:label "Annual Malaria Parasitic Index"@en;
+        rdfs:comment "Número de exames positivos de malária (códigos B50 a B53 da CID-10), por mil habitantes, em determinado espaço geográfico,no ano considerado.Periodicidade de Atualização: Anual Método de Cálculo: Número de exames positivos de malária por local provável de infecção, excluídas Lâminas de Verificaçãode Cura (LVC) dividido pela população total vezes 1000"@pt ;
+        a dcat:Dataset;
+        dcat:landingPage ?uri;
+        dcat:distribution ?csv;
+        qb:structure ?dsd.
+
+    ?row a qb:Observation ;
+        ds:taxa ?indicx;
+        qb:dataSet ?odm6_malaria;
+        sdmx-dimension:refPeriod "2018"^^xsd:integer;
+        ds:doenca obo:DOID_12365;
+        ds:refCidade ?city.
+        
+        ?city a ibge:Cidade;
+            gn:name ?nome.
+        
+} WHERE {
+?row j.1:no_cidade ?nome;
+    j.1:taxa ?indicx .
+    BIND(ENCODE_FOR_URI( STR( ?nome ) ) AS ?nome2)
+    BIND(URI("http://dados.gov.br/dataset/odm6_malaria")AS ?uri)
+    BIND(URI("http://i3geo.saude.gov.br/i3geo/ogc.php?service=WFS&version=1.0.0&request=GetFeature&typeName=odm6_malaria&outputFormat=CSV")AS ?downuri)
+    BIND(URI("http://dados.gov.br/dataset/odm6_malaria")AS ?odm6_malaria)
+    BIND(URI("http://dados.gov.br/dataset/odm6_malaria#csv")AS ?csv)
+    BIND(URI("http://dados.gov.br/dataset/odm6_malaria#dsd")AS ?dsd)
+    BIND(URI("http://dados.gov.br/dataset/odm6_malaria#componente")AS ?componente)
+    BIND(URI(CONCAT("https://cidades.ibge.gov.br/#", STR( ?nome2 )))  AS ?city)
+    BIND(URI(CONCAT("http://dados.gov.br/dataset/odm6_malaria#", "taxa"))  AS ?dsTaxa)
+    BIND(URI(CONCAT("http://dados.gov.br/dataset/odm6_malaria#", "doenca"))  AS ?dsDoenca)
+    BIND(URI(CONCAT("http://dados.gov.br/dataset/odm6_malaria#", "refCidade"))  AS ?refCidade)
+}

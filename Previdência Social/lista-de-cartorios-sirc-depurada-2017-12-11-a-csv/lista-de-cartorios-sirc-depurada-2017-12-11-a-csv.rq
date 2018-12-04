@@ -1,0 +1,59 @@
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> 
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#> 
+PREFIX j.0: <http://w3c/future-csv-vocab/> 
+PREFIX j.1: <file:///Users/amonrhaniery/eclipse-workspace/hierarquiaurbana/input/lista-de-cartorios-sirc-depurada-2017-12-11-a-csv.csv#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX org: <http://www.w3.org/ns/org#>
+PREFIX vcard: <http://www.w3.org/2006/vcard/ns#>
+PREFIX dcat: <http://www.w3.org/ns/dcat#>
+
+CONSTRUCT {
+
+    ?dataset a dcat:Dataset;
+        dcat:landingPage ?uri;
+        dcat:distribution ?csv.
+
+    ?csv a dcat:Distribution;
+        dcat:downloadURL ?downuri;
+        dcat:mediaType "text/csv" .
+
+
+    ?classificacao a skos:Concept;
+        skos:definition "Situação, podendo ser Ativa ou Inativa"@pt;
+        skos:prefLabel ?Situação.
+
+    ?endereco vcard:region ?UF;
+        vcard:postal-code ?CEP;
+        vcard:locality ?Município;
+        vcard:street-address ?enderecoTotal .
+
+     ?cartorio a org:FormalOrganization ;
+        a vcard:Organization ;
+        vcard:organization-name ?Nome;
+        rdfs:comment "Serventia (cartório de RCPN) do SIRC"@pt;
+        vcard:hasAddress ?endereco ;
+        org:identifier ?CNS;
+        org:classification ?classificacao.
+        
+} WHERE {
+    ?row j.1:CNS ?CNS ;
+        j.1:Situação ?Situação ;
+        j.1:Nome ?Nome;
+        j.1:UF ?UF ;
+        j.1:Município ?Município;
+        j.1:Endereço ?Endereço;
+        j.1:Bairro ?Bairro;
+        j.1:CEP ?CEP .
+    BIND(ENCODE_FOR_URI( STR( ?CNS) ) AS ?nome2)
+    BIND(CONCAT(STR(?Endereço)," ") AS ?Endereço1)
+    BIND(CONCAT(STR(?Endereço1),STR(?Bairro)) AS ?enderecoTotal)
+    BIND(URI("http://dados.gov.br/dataset/lista-de-serventias-cartorios-de-rcpn-do-sirc")AS ?uri)
+    BIND(URI("http://dados.gov.br/dataset/lista-de-serventias-cartorios-de-rcpn-do-sirc")AS ?dataset)
+    BIND(URI("http://dados.gov.br/dataset/lista-de-serventias-cartorios-de-rcpn-do-sirc#csv")AS ?csv)
+    BIND(BNODE()AS ?endereco)
+    BIND(BNODE()AS ?classificacao)
+    BIND(URI("http://dadosabertos.dataprev.gov.br/storage/f/2017-12-14T18%3A19%3A46.351Z/lista-de-cartorios-sirc-depurada-2017-12-11-a-csv.csv")AS ?downuri)
+    BIND(URI(CONCAT("https://portal.mj.gov.br/CartorioInterConsulta/#", STR( ?nome2 )))  AS ?cartorio)
+    
+}

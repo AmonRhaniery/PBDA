@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE LIMES SYSTEM "limes.dtd">
+<LIMES>
+<PREFIX>
+    <NAMESPACE>https://metadados.ibge.gov.br/#</NAMESPACE>
+    <LABEL>ibge</LABEL>
+</PREFIX>
+<PREFIX>
+    <NAMESPACE>http://www.w3.org/2006/vcard/ns#</NAMESPACE>
+    <LABEL>vcard</LABEL>
+</PREFIX>
+<PREFIX>
+    <NAMESPACE>http://www.w3.org/ns/org#</NAMESPACE>
+    <LABEL>org</LABEL>
+</PREFIX>
+<PREFIX>
+    <NAMESPACE>http://www.w3.org/2002/07/owl#</NAMESPACE>
+    <LABEL>owl</LABEL>
+</PREFIX>
+<PREFIX>
+    <NAMESPACE>http://www.geonames.org/ontology#</NAMESPACE>
+    <LABEL>gn</LABEL>
+</PREFIX>
+<PREFIX>
+    <NAMESPACE>http://www.w3.org/2000/01/rdf-schema#</NAMESPACE>
+    <LABEL>rdfs</LABEL>
+</PREFIX>
+<PREFIX>
+    <NAMESPACE>http://www.w3.org/1999/02/22-rdf-syntax-ns#</NAMESPACE>
+    <LABEL>rdf</LABEL>
+</PREFIX>
+<PREFIX>
+    <NAMESPACE>http://www.w3.org/2003/01/geo/wgs84_pos#</NAMESPACE>
+    <LABEL>geo</LABEL>
+</PREFIX>
+<PREFIX>
+    <NAMESPACE>http://linkedgeodata.org/ontology/</NAMESPACE>
+    <LABEL>lgdo</LABEL>
+</PREFIX>
+<PREFIX>
+    <NAMESPACE>http://www.opengis.net/rdf#</NAMESPACE>
+    <LABEL>ogc</LABEL>
+</PREFIX>
+<PREFIX>
+    <NAMESPACE>http://geovocab.org/spatial#</NAMESPACE>
+    <LABEL>spatial</LABEL>
+</PREFIX>
+<PREFIX>
+    <NAMESPACE>http://linkedgeodata.org/ontology/</NAMESPACE>
+    <LABEL>lgdo</LABEL>
+</PREFIX>
+<PREFIX>
+    <NAMESPACE>http://dbpedia.org/ontology/</NAMESPACE>
+    <LABEL>dbo</LABEL>
+</PREFIX>
+<PREFIX>
+    <NAMESPACE>http://dbpedia.org/resource/</NAMESPACE>
+    <LABEL>dbr</LABEL>
+</PREFIX>
+<PREFIX>
+    <NAMESPACE>http://purl.org/dc/terms/</NAMESPACE>
+    <LABEL>dct</LABEL>
+</PREFIX>
+<PREFIX>
+    <NAMESPACE>http://dbpedia.org/resource/Category:</NAMESPACE>
+    <LABEL>dbc</LABEL>
+</PREFIX>
+<PREFIX>
+    <NAMESPACE>http://rdf.muninn-project.org/ontologies/military#</NAMESPACE>
+    <LABEL>mil</LABEL>
+</PREFIX>
+<PREFIX>
+    <NAMESPACE>http://pt.dbpedia.org/property/</NAMESPACE>
+    <LABEL>dbpt</LABEL>
+</PREFIX>
+<PREFIX>
+    <NAMESPACE>http://pt.dbpedia.org/resource/</NAMESPACE>
+    <LABEL>dbptr</LABEL>
+</PREFIX>
+<PREFIX>
+    <NAMESPACE>http://gadm.geovocab.org/ontology#</NAMESPACE>
+    <LABEL>gadm</LABEL>
+</PREFIX>
+<PREFIX>
+    <NAMESPACE>http://geovocab.org/spatial#</NAMESPACE>
+    <LABEL>spatial</LABEL>
+</PREFIX>
+<SOURCE>
+    <ID>vwpess65oumaiss</ID>
+    <ENDPOINT>http://localhost:3030/vwpess65oumais/sparql</ENDPOINT>
+    <VAR>?x</VAR>
+    <PAGESIZE>-1</PAGESIZE>
+    <RESTRICTION>?x rdf:type ibge:Cidade</RESTRICTION>
+    <PROPERTY>gn:name</PROPERTY>
+    <PROPERTY>gn:parentADM1 AS replace(ACRE,Acre)->replace(ALAGOAS,Alagoas)->replace(AMAPÁ,Amapá)->replace(AMAZONAS,Amazonas)->replace(BAHIA,Bahia)->replace(CEARÁ,Ceará)->replace(DISTRITO FEDERAL,Distrito Federal)->replace(ESPIRITO SANTO,Espírito Santo)->replace(GOIÁS,Goiás)->replace(MARANHÃO,Maranhão)->replace(MATO GROSSO,Mato Grosso)->replace(MATO GROSSO DO SUL,Mato Grosso do Sul)->replace(MINAS GERAIS,Minas Gerais)->replace(PARÁ,Pará)->replace(PARAÍBA,Paraíba)->replace(PARANÁ,Paraná)->replace(PERNAMBUCO,Pernambuco)->replace(PIAUÍ,Piauí)->replace(RIO DE JANEIRO,Rio de Janeiro)->replace(RIO GRANDE DO NORTE,Rio Grande do Norte)->replace(RIO GRANDE DO SUL,Rio Grande do Sul)->replace(RONDÔNIA,Rondônia)->replace(RORAIMA,Roraima)->replace(SANTA CATARINA,Santa Catarina)->replace(SÃO PAULO,São Paulo)->replace(SERGIPE,Sergipe)->replace(TOCANTINS,Tocantins) RENAME estado</PROPERTY>
+</SOURCE>
+<TARGET>
+    <ID>geonames</ID>
+    <ENDPOINT>http://lod.openlinksw.com/sparql</ENDPOINT>
+    <VAR>?y</VAR>
+    <PAGESIZE>1000</PAGESIZE>
+    <RESTRICTION>?y rdf:type spatial:Feature</RESTRICTION>
+    <RESTRICTION>?y gadm:in_country "Brazil"</RESTRICTION>
+    <PROPERTY>gadm:in_region</PROPERTY>
+    <PROPERTY>rdfs:label AS nolang RENAME nome</PROPERTY>
+</TARGET>
+<METRIC>
+    AND(trigram(x.gn:name,y.nome)|0.95,trigram(x.estado,y.gadm:in_region)|0.95)
+</METRIC>
+<ACCEPTANCE>
+    <THRESHOLD>0.98</THRESHOLD>
+    <FILE>accepted.N3</FILE>
+    <RELATION>owl:sameAs</RELATION>
+</ACCEPTANCE>
+<REVIEW>
+    <THRESHOLD>0.95</THRESHOLD>
+    <FILE>reviewme.N3</FILE>
+    <RELATION>owl:sameAs</RELATION>
+</REVIEW>
+<OUTPUT>N3</OUTPUT>
+</LIMES>

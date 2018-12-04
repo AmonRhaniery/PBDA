@@ -1,0 +1,67 @@
+PREFIX ds: <http://dados.gov.br/dataset/acs_equipes#> 
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX ibge: <https://metadados.ibge.gov.br/#> 
+PREFIX gn: <http://www.geonames.org/ontology#> 
+PREFIX j.0: <http://w3c/future-csv-vocab/> 
+PREFIX j.1: <file:///Users/amonrhaniery/eclipse-workspace/hierarquiaurbana/input/acs_equipesnone.csv#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX org: <http://www.w3.org/ns/org#>
+PREFIX geo: <http://www.w3.org/2003/01/geo/wgs84_pos#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX dcat: <http://www.w3.org/ns/dcat#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+CONSTRUCT {
+
+    ?csv a dcat:Distribution;
+        dcat:downloadURL ?downuri;
+        dcat:mediaType "text/csv" .
+
+    ?dataset a dcat:Dataset;
+        dcat:landingPage ?uri;
+        dcat:distribution ?csv ;
+        rdfs:label "Número de Equipes de Agentes Comunitários de Saúde - ACS"@pt;
+        rdfs:label "Number of Community Health Agents Teams - ACS"@en;
+        rdfs:comment "A Estratégia Saúde da Família (ESF) é o modelo assistencial da Atenção Básica, que se fundamenta no trabalho de equipesmultiprofissionais em um território adstrito e desenvolve ações de saúde a partir do conhecimento da realidade local e dasnecessidades de sua população. A equipe é composta , no mínimo, médico generalista ou especialista em saúde da família oumédico de família e comunidade, enfermeiro generalista ou especialista em saúde da família, auxiliar ou técnico de enfermageme agentes comunitários de saúde (ACS).O Agente Comunitário de Saúde é capacitado para reunir informações de saúde sobre uma comunidade. Orientado por supervisor(profissional enfermeiro ou médico) da unidade de saúde, realiza visitas domiciliares na área de abrangência da sua unidade,produzindo informações capazes de dimensionar os principais problemas de saúde de sua comunidade.Os Agentes Comunitários de Saúde podem ser encontrados em duas situações distintas em relação à rede do SUS: - Ligados a uma unidade básica de saúde ainda não organizada na lógica da Saúde da Família, - Ligados a uma unidade básica de Saúde da Família como membro da equipe multiprofissional, presentes tanto em comunidadesrurais e periferias urbanas quanto em municípios altamente urbanizados e industrializados.O número de ACS deve ser suficiente para cobrir 100% da população cadastrada, com um máximo de 750 pessoas por agente e de12 ACS por equipe de Saúde da Família, não ultrapassando o limite máximo recomendado de pessoas por equipe.Interpretação: Nível de Agregação: Periodicidade de Atualização: Anual, Semestral, Mensal."@pt .
+ 
+    ?dshasTotalNumber a rdf:Property;
+        rdfs:label "Total de agentes."@pt ;
+        rdfs:label "Total Agents"@en;
+        rdfs:range xsd:integer .
+
+    ?equipe a foaf:Group;
+        rdfs:label "Equipe de Agentes Comunitários de Saúde"@pt;
+        rdfs:label "Community Health Agents Team"@en;
+        ds:hasTotal ?equipes .
+
+    ?ms a org:FormalOrganization;
+        skos:prefLabel "Ministério da Saúde"@pt;
+        org:hasUnit ?unidade.
+
+    ?unidade a org:OrganizationUnit ;
+        a geo:Point;
+        geo:lat ?lat ;
+        geo:long ?long ;
+        org:hasMember ?equipe;
+        org:hasSite ?city.
+
+    ?city a ibge:Cidade;
+        a org:Site ;
+        gn:name ?no_cidade .
+        
+} WHERE {
+    ?row j.1:no_cidade ?no_cidade ;
+        j.1:equipes ?equipes ;
+        j.1:lat ?lat ;
+        j.1:long ?long .
+    BIND(ENCODE_FOR_URI( STR( ?no_cidade ) ) AS ?nome2)
+    BIND(URI("http://portalms.saude.gov.br") AS ?ms)
+    BIND(URI("http://dados.gov.br/dataset/acs_equipes")AS ?uri)
+    BIND(URI(CONCAT("http://dados.gov.br/dataset/acs_equipes#equipe", STR( ?nome2 ))) AS ?equipe)
+    BIND(URI("http://dados.gov.br/dataset/acs_equipes#csv")AS ?csv)
+    BIND(URI("http://i3geo.saude.gov.br/i3geo/ogc.php?service=WFS&version=1.0.0&request=GetFeature&typeName=acs_equipes&outputFormat=CSV")AS ?downuri)
+    BIND(URI("http://dados.gov.br/dataset/acs_equipes")AS ?dataset)
+    BIND(URI(CONCAT("http://dados.gov.br/dataset/acs_equipes#acs", STR( ?nome2 )))  AS ?unidade)
+    BIND(URI(CONCAT("https://cidades.ibge.gov.br/#", STR( ?nome2 )))  AS ?city)
+    BIND(URI(CONCAT("http://dados.gov.br/dataset/acs_equipes#", "hasTotal"))  AS ?dshasTotalNumber)
+}

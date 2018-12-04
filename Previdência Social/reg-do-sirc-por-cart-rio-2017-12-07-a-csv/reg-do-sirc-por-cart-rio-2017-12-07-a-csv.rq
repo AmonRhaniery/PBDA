@@ -1,0 +1,185 @@
+PREFIX ds: <http://dados.gov.br/dataset/registros-civis-da-base-nacional-do-sirc>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> 
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#> 
+PREFIX j.0: <http://w3c/future-csv-vocab/> 
+PREFIX j.1: <file:///Users/amonrhaniery/eclipse-workspace/hierarquiaurbana/input/reg-do-sirc-por-cart-rio-2017-12-07-a-csv.csv#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX sdmx-dimension: <http://purl.org/linked-data/sdmx/2009/dimension#>
+PREFIX sdmx-measure: <http://purl.org/linked-data/sdmx/2009/measure#>
+PREFIX sdmx-concept: <http://purl.org/linked-data/sdmx/2009/concept#>
+PREFIX qb: <http://purl.org/linked-data/cube#>
+PREFIX org: <http://www.w3.org/ns/org#>
+PREFIX vcard: <http://www.w3.org/2006/vcard/ns#>
+PREFIX dcat: <http://www.w3.org/ns/dcat#>
+
+CONSTRUCT {
+
+    ?refCartorio a qb:DimensionProperty;
+        a rdf:Property;
+        rdfs:label "Cartório referente"@pt;
+        rdfs:label "Notary related"@en;
+        rdfs:comment "Cartório sobre o qual foram realizadas as coletas dos dados."@pt;
+        rdfs:range org:FormalOrganization.
+
+    ?dsQtdNascArq a qb:MeasureProperty;
+        rdfs:subPropertyOf sdmx-measure:obsValue;
+        rdfs:label "Quantidade de Nascimentos informados por arquivo"@pt;
+        rdfs:label "Number of birth registries informed by file"@en;
+        rdfs:range xsd:integer.
+
+    ?dsQtdCasArq a qb:MeasureProperty;
+        rdfs:subPropertyOf sdmx-measure:obsValue;
+        rdfs:label "Quantidade de Casamentos informados por arquivo"@pt;
+        rdfs:label "Number of wedding registries informed by file"@en;
+        rdfs:range xsd:integer.
+
+    ?dsQtdObtArq a qb:MeasureProperty;
+        rdfs:subPropertyOf sdmx-measure:obsValue;
+        rdfs:label "Quantidade de Óbitos informados por arquivo"@pt;
+        rdfs:label "Number of deaths informed by file"@en;
+        rdfs:range xsd:integer.
+
+    ?dsQtdNascOn a qb:MeasureProperty;
+        rdfs:subPropertyOf sdmx-measure:obsValue;
+        rdfs:label "Quantidade de Nascimentos informados on-line"@pt;
+        rdfs:label "Number of birth registries informed on-line"@en;
+        rdfs:range xsd:integer.
+
+    ?dsQtdCasOn a qb:MeasureProperty;
+        rdfs:subPropertyOf sdmx-measure:obsValue;
+        rdfs:label "Quantidade de Casamentos informados on-line"@pt;
+        rdfs:label "Number of wedding registries informed on-line"@en;
+        rdfs:range xsd:integer.
+
+    ?dsQtdObtOn a qb:MeasureProperty;
+        rdfs:subPropertyOf sdmx-measure:obsValue;
+        rdfs:label "Quantidade de Óbitos informados on-line"@pt;
+         rdfs:label "Number of deaths informed on-line"@en;
+        rdfs:range xsd:integer.
+
+    ?dsQtdNascOutros a qb:MeasureProperty;
+        rdfs:subPropertyOf sdmx-measure:obsValue;
+        rdfs:label "Quantidade de Nascimentos informados outros meios"@pt;
+        rdfs:label "Number of birth registries informed by other means"@en;
+        rdfs:range xsd:integer.
+
+    ?dsQtdCasOutros a qb:MeasureProperty;
+        rdfs:subPropertyOf sdmx-measure:obsValue;
+        rdfs:label "Quantidade de Casamentos informados outros meios"@pt;
+        rdfs:label "Number of wedding registries informed by other means"@en;
+        rdfs:range xsd:integer.
+
+    ?dsQtdObtOutros a qb:MeasureProperty;
+        rdfs:subPropertyOf sdmx-measure:obsValue;
+        rdfs:label "Quantidade de Óbitos informados por outros meios"@pt;
+         rdfs:label "Number of deaths informed by other means"@en;
+        rdfs:range xsd:integer.
+
+    ?dsQtdNascSISOBI a qb:MeasureProperty;
+        rdfs:subPropertyOf sdmx-measure:obsValue;
+        rdfs:label "Quantidade de Nascimentos informados pelo SISOBI"@pt;
+        rdfs:label "Number of birth registries informed by SISOBI"@en;
+        rdfs:range xsd:integer.
+
+    ?dsQtdCasSISOBI a qb:MeasureProperty;
+        rdfs:subPropertyOf sdmx-measure:obsValue;
+        rdfs:label "Quantidade de Casamentos informados pelo SISOBI"@pt;
+        rdfs:label "Number of wedding registries informed by SISOBI"@en;
+        rdfs:range xsd:integer.
+
+    ?dsQtdObtSISOBI a qb:MeasureProperty;
+        rdfs:subPropertyOf sdmx-measure:obsValue;
+        rdfs:label "Quantidade de Óbitos informados pelo SISOBI"@pt;
+         rdfs:label "Number of deaths informed by SISOBI"@en;
+        rdfs:range xsd:integer.
+
+    ?componente qb:measure ?dsQtdCasArq ;
+            qb:measure ?dsQtdCasOn ;
+            qb:measure ?dsQtdCasOutros ;
+            qb:measure ?dsQtdCasSISOBI ;
+            qb:measure ?dsQtdNascArq ;
+            qb:measure ?dsQtdNascOutros ;
+            qb:measure ?dsQtdNascOn ;
+            qb:measure ?dsQtdNascSISOBI ;
+            qb:measure ?dsQtdObtArq ;
+            qb:measure ?dsQtdObtOn ;
+            qb:measure ?dsQtdObtOutros ;
+            qb:measure ?dsQtdObtSISOBI ;
+            qb:dimension sdmx-dimension:refPeriod ;
+            qb:dimension ?refCartorio .
+
+    ?dsd a qb:DataStructureDefinition;
+        qb:component ?componente.
+
+    ?dataset a dcat:Dataset;
+        dcat:landingPage ?uri;
+        dcat:distribution ?csv;
+        rdfs:label "Registros Civis da base nacional do SIRC"@pt;
+        rdfs:label "Civil Records of the National SIRC Base"@en;
+        rdfs:comment "Volumes de registros civis (nascimento, casamento e óbito) constantes na base nacional de dados do SIRC"@pt ;
+        qb:structure ?dsd.
+
+    ?csv a dcat:Distribution;
+        dcat:downloadURL ?downuri;
+        dcat:mediaType "text/csv" .
+
+    ?row a qb:Observation ;
+        qb:dataSet ?dataset;
+        sdmx-dimension:refPeriod "2017" ;
+        ds:refCartorio ?cartorio;
+        ds:QtdCasArq ?QtdCasArq ;
+        ds:QtdCasOn ?dsQtdCasOn ;
+        ds:QtdCasOutros ?dsQtdCasOutros ;
+        ds:QtdCasSISOBI ?dsQtdCasSISOBI ;
+        ds:QtdNascArq ?dsQtdNascArq ;
+        ds:QtdNascOutros ?dsQtdNascOutros ;
+        ds:QtdNascOn ?dsQtdNascOn ;
+        ds:QtdNascSISOBI ?dsQtdNascSISOBI ;
+        ds:QtdObtArq ?dsQtdObtArq ;
+        ds:QtdObtOn ?dsQtdObtOn ;
+        ds:QtdObtOutros ?dsQtdObtOutros ;
+        ds:QtdObtSISOBI ?dsQtdObtSISOBI .
+
+     ?cartorio a org:FormalOrganization ;
+        org:identifier ?Cartório .
+
+        
+} WHERE {
+    ?row j.1:Cartório ?Cartório ;
+        j.1:Qtd.%20Nascimentos%20informados%20por%20arquivo ?QtdNascArq ;
+        j.1:Qtd.%20Óbitos%20informados%20por%20outros%20meios ?QtdObtOutros;
+        j.1:Qtd.%20Casamentos%20informados%20on-line ?QtdCasOn ;
+        j.1:Qtd.%20Nascimentos%20informados%20on-line ?QtdNascOn ;
+        j.1:Qtd.%20Óbitos%20informados%20pelo%20SISOBI ?QtdObtSISOBI;
+        j.1:Qtd.%20Óbitos%20informados%20por%20arquivo ?QtdObtArq;
+        j.1:Qtd.%20Óbitos%20informados%20on-line ?QtdObtOn;
+        j.1:Qtd.%20Casamentos%20informados%20por%20arquivo ?QtdCasArq;
+        j.1:Qtd.%20Nascimentos%20informados%20pelo%20SISOBI ?QtdNascSISOBI; 
+        j.1:Qtd.%20Nascimentos%20informados%20por%20outros%20meios ?QtdNascOutros;
+        j.1:Qtd.%20Casamentos%20informados%20pelo%20SISOBI ?QtdCasSISOBI;
+        j.1:Qtd.%20Casamentos%20informados%20por%20outros%20meios ?QtdCasOutros.
+
+    BIND(ENCODE_FOR_URI( STR( ?Cartório) ) AS ?nome2)
+    BIND(URI("http://dados.gov.br/dataset/registros-civis-da-base-nacional-do-sirc")AS ?uri)
+    BIND(URI("http://dados.gov.br/dataset/registros-civis-da-base-nacional-do-sirc#csv")AS ?csv)
+    BIND(URI("http://dados.gov.br/dataset/registros-civis-da-base-nacional-do-sirc#dsd")AS ?dsd)
+    BIND(URI("http://dados.gov.br/dataset/registros-civis-da-base-nacional-do-sirc")AS ?dataset)
+    BIND(URI("http://dados.gov.br/dataset/registros-civis-da-base-nacional-do-sirc#componente")AS ?componente)
+    BIND(URI("http://dados.gov.br/dataset/registros-civis-da-base-nacional-do-sirc#refCartorio")AS ?refCartorio)
+    BIND(URI("http://dadosabertos.dataprev.gov.br/storage/f/2017-12-14T18%3A14%3A19.115Z/reg-do-sirc-por-cart-rio-2017-12-07-a-csv.csv")AS ?downuri)
+    BIND(URI(CONCAT("https://portal.mj.gov.br/CartorioInterConsulta/#", STR( ?nome2 )))  AS ?cartorio)
+    BIND(URI(CONCAT("http://dados.gov.br/dataset/registros-civis-da-base-nacional-do-sirc#", "QtdCasArq"))  AS ?dsQtdCasArq)
+    BIND(URI(CONCAT("http://dados.gov.br/dataset/registros-civis-da-base-nacional-do-sirc#", "QtdCasOn"))  AS ?dsQtdCasOn)
+    BIND(URI(CONCAT("http://dados.gov.br/dataset/registros-civis-da-base-nacional-do-sirc#", "QtdCasOutros"))  AS ?dsQtdCasOutros)
+    BIND(URI(CONCAT("http://dados.gov.br/dataset/registros-civis-da-base-nacional-do-sirc#", "QtdCasSISOBI"))  AS ?dsQtdCasSISOBI)
+    BIND(URI(CONCAT("http://dados.gov.br/dataset/registros-civis-da-base-nacional-do-sirc#", "QtdObtArq"))  AS ?dsQtdObtArq)
+    BIND(URI(CONCAT("http://dados.gov.br/dataset/registros-civis-da-base-nacional-do-sirc#", "QtdObtOn"))  AS ?dsQtdObtOn)
+    BIND(URI(CONCAT("http://dados.gov.br/dataset/registros-civis-da-base-nacional-do-sirc#", "QtdObtOutros"))  AS ?dsQtdObtOutros)
+    BIND(URI(CONCAT("http://dados.gov.br/dataset/registros-civis-da-base-nacional-do-sirc#", "QtdObtSISOBI"))  AS ?dsQtdObtSISOBI)
+    BIND(URI(CONCAT("http://dados.gov.br/dataset/registros-civis-da-base-nacional-do-sirc#", "QtdNascArq"))  AS ?dsQtdNascArq)
+    BIND(URI(CONCAT("http://dados.gov.br/dataset/registros-civis-da-base-nacional-do-sirc#", "QtdNascOn"))  AS ?dsQtdNascOn)
+    BIND(URI(CONCAT("http://dados.gov.br/dataset/registros-civis-da-base-nacional-do-sirc#", "QtdNascOutros"))  AS ?dsQtdNascOutros)
+    BIND(URI(CONCAT("http://dados.gov.br/dataset/registros-civis-da-base-nacional-do-sirc#", "QtdNascSISOBI"))  AS ?dsQtdNascSISOBI)
+}
+

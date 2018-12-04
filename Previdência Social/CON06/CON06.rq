@@ -1,0 +1,119 @@
+PREFIX ds: <http://dados.gov.br/dataset/aposentadorias-concedidas-por-anos-de-servico#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> 
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX gn: <http://www.geonames.org/ontology#> 
+PREFIX j.0: <http://w3c/future-csv-vocab/> 
+PREFIX j.1: <file:///Users/amonrhaniery/eclipse-workspace/hierarquiaurbana/input/CON06.csv#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX sdmx-dimension: <http://purl.org/linked-data/sdmx/2009/dimension#>
+PREFIX sdmx-measure: <http://purl.org/linked-data/sdmx/2009/measure#>
+PREFIX sdmx-concept: <http://purl.org/linked-data/sdmx/2009/concept#>
+PREFIX sdmx-code: <http://purl.org/linked-data/sdmx/2009/code#>
+PREFIX qb: <http://purl.org/linked-data/cube#>
+PREFIX org: <http://www.w3.org/ns/org#>
+PREFIX vcard: <http://www.w3.org/2006/vcard/ns#>
+PREFIX dcat: <http://www.w3.org/ns/dcat#>
+
+CONSTRUCT {
+
+    ?refEspecie a qb:DimensionProperty;
+        a rdf:Property ;
+        rdfs:label "Espécie concedida."@pt ;
+        rdfs:label "Kind granted"@en;
+        rdfs:isDefinedBy <http://www1.previdencia.gov.br/aeps2006/15_01_01_01.asp> ;
+        rdfs:seeAlso <https://www.inss.gov.br/beneficios/> ;
+        rdfs:range xsd:string.
+            
+    ?refAnosSvc a qb:DimensionProperty;
+        a rdf:Property ;
+        rdfs:label "Anos de Serviço do Segurado"@pt ;
+        rdfs:label "Years of Insured Service"@en ;
+        rdfs:isDefinedBy <http://www1.previdencia.gov.br/aeps2006/15_01_01_01.asp> ;
+        rdfs:range xsd:string.
+
+    ?refClientela a qb:DimensionProperty;
+        a rdf:Property ;
+        rdfs:label "Clientela"@pt;
+        rdfs:label "Clientele"@en;
+        rdfs:isDefinedBy <http://www1.previdencia.gov.br/aeps2006/15_01_01_01.asp>;
+        rdfs:range xsd:string .
+
+    ?dsQtdBenConc a qb:MeasureProperty;
+        rdfs:subPropertyOf sdmx-measure:obsValue;
+        rdfs:label "Quantidade de Benefícios Concedidos"@pt;
+        rdfs:label "Number of granted benefits"@en;
+        rdfs:range xsd:integer.
+
+    ?dsValorBenConc a qb:MeasureProperty;
+        rdfs:subPropertyOf sdmx-measure:obsValue;
+        rdfs:label "Valor dos Benefícios Concedidos em Reais"@pt;
+        rdfs:label "Value of the granted benefits in reais"@en;
+        rdfs:range xsd:decimal.
+
+    ?dsValorBenConcMil a qb:MeasureProperty;
+        rdfs:subPropertyOf sdmx-measure:obsValue;
+        rdfs:label "Valor dos Benefícios Concedidos em Reais por Mil"@pt;
+        rdfs:label "Value of the granted benefits per 1000"@en;
+        rdfs:range xsd:decimal.
+
+    ?componente qb:measure ?dsQtdBenConc ;
+            qb:measure ?dsValorBenConc ;
+            qb:measure ?dsValorBenConcMil ;
+            qb:dimension sdmx-dimension:refPeriod ;
+            qb:dimension sdmx-dimension:sex ;
+            qb:dimension ?refAnosSvc;
+            qb:dimension ?refClientela;
+            qb:dimension ?refEspecie .
+
+    ?dsd a qb:DataStructureDefinition;
+        qb:component ?componente.
+
+    ?dataset a dcat:Dataset;
+        a qb:DataSet;
+        dcat:landingPage ?uri;
+        dcat:distribution ?csv;
+        rdfs:label "Aposentadorias concedidas por anos de serviço"@pt;
+        rdfs:label "Retirements granted by years of service"@en;
+        rdfs:comment "Benefícios concedidos por anos de serviço do beneficiário, grupos de espécie específicos, sexo do beneficiário, clientela e ano da Data de Despacho do Benefício (DDB). Não inclui pensões alimentícias, desdobramentos de pensões por morte nem benefícios de prestação única. Considera apenas espécies de 'aposentadorias por tempo de contribuição'."@pt ;
+        qb:structure ?dsd.
+
+    ?csv a dcat:Distribution;
+        dcat:downloadURL ?downuri;
+        dcat:mediaType "text/csv" .
+
+    ?row a qb:Observation ;
+        qb:dataSet ?dataset;
+        sdmx-dimension:refPeriod ?Ano ;
+        sdmx-dimension:sex ?genero;
+        ds:refEspecie ?Espécie ;
+        ds:refAnosSvc ?AnosDeServico ;
+        ds:refClientela ?Clientela;
+        ds:QtdBenConc ?QtdBenConc ;
+        ds:ValorBenConc ?ValorBenConc ;
+        ds:ValorBenConcMil ?ValorBenConcMil .
+        
+} WHERE {
+    ?row j.1:Ano ?Ano ;
+        j.1:Espécie ?Espécie ;
+        j.1:Anos%20de%20Serviço%20do%20Segurado ?AnosDeServico;
+        j.1:Sexo ?Sexo;
+        j.1:Clientela ?Clientela ;
+        j.1:Qte%20Benefícios%20Concedidos ?QtdBenConc ;
+        j.1:Vlr%20Benefícios%20Concedidos ?ValorBenConc;
+        j.1:Vlr%20Benef%20Concedidos%20Mil ?ValorBenConcMil.
+
+    BIND(IF(?Sexo="Masculino",sdmx-code:sex-M,sdmx-code:sex-F) AS ?genero)
+    BIND(URI("http://dados.gov.br/dataset/aposentadorias-concedidas-por-anos-de-servico")AS ?uri)
+    BIND(URI("http://dados.gov.br/dataset/aposentadorias-concedidas-por-anos-de-servico#dataset")AS ?dataset)
+    BIND(URI("http://dados.gov.br/dataset/aposentadorias-concedidas-por-anos-de-servico#csv")AS ?csv)
+    BIND(URI("http://dados.gov.br/dataset/aposentadorias-concedidas-por-anos-de-servico#dsd")AS ?dsd)
+    BIND(URI("http://dados.gov.br/dataset/aposentadorias-concedidas-por-anos-de-servico#componente")AS ?componente)
+    BIND(URI("http://dadosabertos.dataprev.gov.br/opendata/con06/formato=csv")AS ?downuri)
+    BIND(URI(CONCAT("http://dados.gov.br/dataset/aposentadorias-concedidas-por-anos-de-servico#", "QtdBenConc"))  AS ?dsQtdBenConc)
+    BIND(URI(CONCAT("http://dados.gov.br/dataset/aposentadorias-concedidas-por-anos-de-servico#", "ValorBenConc"))  AS ?dsValorBenConc)
+    BIND(URI(CONCAT("http://dados.gov.br/dataset/aposentadorias-concedidas-por-anos-de-servico#", "ValorBenConcMil"))  AS ?dsValorBenConcMil)
+    BIND(URI(CONCAT("http://dados.gov.br/dataset/aposentadorias-concedidas-por-anos-de-servico#", "refEspecie"))  AS ?refEspecie)
+    BIND(URI(CONCAT("http://dados.gov.br/dataset/aposentadorias-concedidas-por-anos-de-servico#", "refClientela"))  AS ?refClientela)
+    BIND(URI(CONCAT("http://dados.gov.br/dataset/aposentadorias-concedidas-por-anos-de-servico#", "refAnosSvc"))  AS ?refAnosSvc)
+}

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE LIMES SYSTEM "limes.dtd">
+<LIMES>
+<PREFIX>
+    <NAMESPACE>https://metadados.ibge.gov.br/#</NAMESPACE>
+    <LABEL>ibge</LABEL>
+</PREFIX>
+<PREFIX>
+    <NAMESPACE>http://www.w3.org/2002/07/owl#</NAMESPACE>
+    <LABEL>owl</LABEL>
+</PREFIX>
+<PREFIX>
+    <NAMESPACE>http://www.geonames.org/ontology#</NAMESPACE>
+    <LABEL>gn</LABEL>
+</PREFIX>
+<PREFIX>
+    <NAMESPACE>http://www.w3.org/2000/01/rdf-schema#</NAMESPACE>
+    <LABEL>rdfs</LABEL>
+</PREFIX>
+<PREFIX>
+    <NAMESPACE>http://www.w3.org/1999/02/22-rdf-syntax-ns#</NAMESPACE>
+    <LABEL>rdf</LABEL>
+</PREFIX>
+<SOURCE>
+    <ID>odm6_malarianone</ID>
+    <ENDPOINT>http://localhost:3030/odm6_malarianone/sparql</ENDPOINT>
+    <VAR>?x</VAR>
+    <PAGESIZE>-1</PAGESIZE>
+    <RESTRICTION>?x rdf:type ibge:Cidade</RESTRICTION>
+    <PROPERTY>gn:name</PROPERTY>
+</SOURCE>
+<TARGET>
+    <ID>HierarquiaUrbanaRegic2007</ID>
+    <ENDPOINT>http://localhost:3030/hierarquiaurbana/sparql</ENDPOINT>
+    <VAR>?y</VAR>
+    <PAGESIZE>-1</PAGESIZE>
+    <RESTRICTION>?y rdf:type ibge:Cidade</RESTRICTION>
+    <PROPERTY>gn:name</PROPERTY>
+</TARGET>
+<METRIC>
+    trigram(x.gn:name,y.gn:name)
+</METRIC>
+<ACCEPTANCE>
+    <THRESHOLD>0.98</THRESHOLD>
+    <FILE>accepted.N3</FILE>
+    <RELATION>owl:sameAs</RELATION>
+</ACCEPTANCE>
+<REVIEW>
+    <THRESHOLD>0.9</THRESHOLD>
+    <FILE>reviewme.N3</FILE>
+    <RELATION>owl:sameAs</RELATION>
+</REVIEW>
+<OUTPUT>N3</OUTPUT>
+</LIMES>

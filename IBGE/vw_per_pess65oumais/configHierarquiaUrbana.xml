@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE LIMES SYSTEM "limes.dtd">
+<LIMES>
+<PREFIX>
+    <NAMESPACE>https://metadados.ibge.gov.br/#</NAMESPACE>
+    <LABEL>ibge</LABEL>
+</PREFIX>
+<PREFIX>
+    <NAMESPACE>http://www.w3.org/2002/07/owl#</NAMESPACE>
+    <LABEL>owl</LABEL>
+</PREFIX>
+<PREFIX>
+    <NAMESPACE>http://www.geonames.org/ontology#</NAMESPACE>
+    <LABEL>gn</LABEL>
+</PREFIX>
+<PREFIX>
+    <NAMESPACE>http://www.w3.org/2000/01/rdf-schema#</NAMESPACE>
+    <LABEL>rdfs</LABEL>
+</PREFIX>
+<PREFIX>
+    <NAMESPACE>http://www.w3.org/1999/02/22-rdf-syntax-ns#</NAMESPACE>
+    <LABEL>rdf</LABEL>
+</PREFIX>
+<SOURCE>
+    <ID>vw_perpess65oumais</ID>
+    <ENDPOINT>http://localhost:3030/vwpess65oumais/sparql</ENDPOINT>
+    <VAR>?x</VAR>
+    <PAGESIZE>-1</PAGESIZE>
+    <RESTRICTION>?x rdf:type ibge:Cidade</RESTRICTION>
+    <PROPERTY>gn:parentADM1</PROPERTY>
+    <PROPERTY>gn:name</PROPERTY>
+    <PROPERTY>gn:parentADM1 AS replace(ACRE,AC)->replace(ALAGOAS,AL)->replace(AMAPÁ,AP)->replace(AMAZONAS,AM)->replace(BAHIA,BA)->replace(CEARÁ,CE)->replace(DISTRITO FEDERAL,DF)->replace(ESPÍRITO SANTO,ES)->replace(GOIÁS,GO)->replace(MARANHÃO,MA)->replace(MATO GROSSO,MT)->replace(MATO GROSSO DO SUL,MS)->replace(MINAS GERAIS,MG)->replace(PARÁ,PA)->replace(PARAÍBA,PB)->replace(PARANÁ,PR)->replace(PERNAMBUCO,PE)->replace(PIAUÍ,PI)->replace(RIO DE JANEIRO,RJ)->replace(RIO GRANDE DO NORTE,RN)->replace(RIO GRANDE DO SUL,RS)->replace(RONDÔNIA,RO)->replace(RORAIMA,RR)->replace(SANTA CATARINA,SC)->replace(SÃO PAULO,SP)->replace(SERGIPE,SE)->replace(TOCANTINS,TO) RENAME estado</PROPERTY>
+</SOURCE>
+<TARGET>
+    <ID>HierarquiaUrbanaRegic2007</ID>
+    <ENDPOINT>http://localhost:3030/hierarquiaurbana/sparql</ENDPOINT>
+    <VAR>?y</VAR>
+    <PAGESIZE>-1</PAGESIZE>
+    <RESTRICTION>?y rdf:type ibge:Cidade</RESTRICTION>
+    <PROPERTY>gn:name</PROPERTY>
+    <PROPERTY>gn:parentADM1</PROPERTY>
+</TARGET>
+<METRIC>
+    AND(trigram(x.gn:name,y.gn:name)|0.98,trigram(x.estado,y.gn:parentADM1)|0.98)
+</METRIC>
+<ACCEPTANCE>
+    <THRESHOLD>0.98</THRESHOLD>
+    <FILE>acceptedvw_per_pess65oumais.N3</FILE>
+    <RELATION>owl:sameAs</RELATION>
+</ACCEPTANCE>
+<REVIEW>
+    <THRESHOLD>0.9</THRESHOLD>
+    <FILE>reviewme.N3</FILE>
+    <RELATION>owl:sameAs</RELATION>
+</REVIEW>
+<OUTPUT>N3</OUTPUT>
+</LIMES>

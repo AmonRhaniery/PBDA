@@ -1,0 +1,80 @@
+PREFIX ds: <http://dados.gov.br/dataset/odm6_dengue#> 
+PREFIX RDF: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> 
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX ibge: <https://metadados.ibge.gov.br/#> 
+PREFIX gn: <http://www.geonames.org/ontology#> 
+PREFIX obo: <http://purl.obolibrary.org/obo/>
+PREFIX j.0: <http://w3c/future-csv-vocab/> 
+PREFIX j.1: <file:///Users/amonrhaniery/eclipse-workspace/hierarquiaurbana/input/odm6_denguenone.csv#>
+PREFIX sdmx-dimension: <http://purl.org/linked-data/sdmx/2009/dimension#>
+PREFIX sdmx-measure: <http://purl.org/linked-data/sdmx/2009/measure#>
+PREFIX sdmx-concept: <http://purl.org/linked-data/sdmx/2009/concept#>
+PREFIX qb: <http://purl.org/linked-data/cube#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX dcat: <http://www.w3.org/ns/dcat#>
+
+CONSTRUCT {
+
+    ?refCidade a qb:DimensionProperty;
+        rdfs:subPropertyOf sdmx-dimension:refArea;
+        qb:concept sdmx-concept:refArea;
+        rdfs:range gn:P.
+
+    ?dsDoenca a qb:DimensionProperty;
+        qb:concept <http://vocabularies.unesco.org/thesaurus/concept8188>;
+        rdfs:label "Doença"@pt;
+        rdfs:label "Disease"@en;
+        rdfs:range obo:DOID_4.
+
+    ?dsObito a qb:MeasureProperty;
+        rdfs:subPropertyOf sdmx-measure:obsValue;
+        rdfs:label "Número absoluto de óbitos"@pt;
+        rdfs:label "Absolute number of deaths"@en;
+        rdfs:range xsd:integer.
+
+    ?componente qb:measure ?dsObito;
+         qb:dimension ?dsDoenca ;
+          qb:dimension sdmx-dimension:refPeriod ;
+           qb:dimension ?refCidade.
+
+    ?dsd a qb:DataStructureDefinition;
+        qb:component ?componente.
+
+    ?csv a dcat:Distribution;
+        dcat:downloadURL ?downuri;
+        dcat:mediaType "text/csv" .
+
+    ?odm6_dengue a qb:DataSet;
+        rdfs:label "Número de óbitos por dengue"@pt;
+        rdfs:label "Number of deaths caused by dengue fever"@en;
+        rdfs:comment "Número de casos notificados de dengue exceto descartados, que evoluíram para óbito. Para o cálculo foi considerado o anode 2010Periodicidade de Atualização: Anual Método de Cálculo: Número absoluto"@pt ;
+        a dcat:Dataset;
+        dcat:landingPage ?uri;
+        dcat:distribution ?csv;
+        qb:structure ?dsd.
+
+    ?row a qb:Observation ;
+        ds:obitos ?indicx;
+        qb:dataSet ?odm6_dengue;
+        sdmx-dimension:refPeriod "2018"^^xsd:integer;
+        ds:doenca obo:DOID_12205;
+        ds:refCidade ?city.
+        
+        ?city a ibge:Cidade;
+            gn:name ?nome.
+        
+} WHERE {
+?row j.1:no_cidade ?nome;
+    j.1:indicx ?indicx .
+    BIND(ENCODE_FOR_URI( STR( ?nome ) ) AS ?nome2)
+    BIND(URI(CONCAT("https://cidades.ibge.gov.br/#", STR( ?nome2 )))  AS ?city)
+    BIND(URI("http://dados.gov.br/dataset/odm6_dengue")AS ?uri)
+    BIND(URI("http://i3geo.saude.gov.br/i3geo/ogc.php?service=WFS&version=1.0.0&request=GetFeature&typeName=odm6_dengue&outputFormat=CSV")AS ?downuri)
+    BIND(URI("http://dados.gov.br/dataset/odm6_dengue")AS ?odm6_dengue)
+    BIND(URI("http://dados.gov.br/dataset/odm6_dengue#componente")AS ?componente)
+    BIND(URI("http://dados.gov.br/dataset/odm6_dengue#dsd")AS ?dsd)
+    BIND(URI("http://dados.gov.br/dataset/odm6_dengue#csv")AS ?csv)
+    BIND(URI(CONCAT("http://dados.gov.br/dataset/odm6_dengue#", "obitos"))  AS ?dsObito)
+    BIND(URI(CONCAT("http://dados.gov.br/dataset/odm6_dengue#", "doenca"))  AS ?dsDoenca)
+    BIND(URI(CONCAT("http://dados.gov.br/dataset/odm6_dengue#", "refCidade"))  AS ?refCidade)
+}

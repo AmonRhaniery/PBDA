@@ -1,0 +1,86 @@
+PREFIX ds: <http://dados.gov.br/dataset/beneficios-cessados-com-motivo-morte-por-duracao#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> 
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX gn: <http://www.geonames.org/ontology#> 
+PREFIX j.0: <http://w3c/future-csv-vocab/> 
+PREFIX j.1: <file:///Users/amonrhaniery/eclipse-workspace/hierarquiaurbana/input/CES05.csv#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX sdmx-dimension: <http://purl.org/linked-data/sdmx/2009/dimension#>
+PREFIX sdmx-measure: <http://purl.org/linked-data/sdmx/2009/measure#>
+PREFIX sdmx-concept: <http://purl.org/linked-data/sdmx/2009/concept#>
+PREFIX sdmx-code: <http://purl.org/linked-data/sdmx/2009/code#>
+PREFIX qb: <http://purl.org/linked-data/cube#>
+PREFIX org: <http://www.w3.org/ns/org#>
+PREFIX vcard: <http://www.w3.org/2006/vcard/ns#>
+PREFIX dcat: <http://www.w3.org/ns/dcat#>
+
+CONSTRUCT {
+          
+    ?refTempoDuracao a qb:DimensionProperty;
+        a rdf:Property ;
+        rdfs:label "Tempo de Duração"@pt ;
+        rdfs:label "Duration"@en ;
+        rdfs:isDefinedBy <http://www1.previdencia.gov.br/aeps2006/15_01_01_01.asp> ;
+        rdfs:range xsd:string.
+
+    ?refClientela a qb:DimensionProperty;
+        a rdf:Property ;
+        rdfs:label "Clientela"@pt ;
+        rdfs:label "Clientele"@en;
+        rdfs:isDefinedBy <http://www1.previdencia.gov.br/aeps2006/15_01_01_01.asp>;
+        rdfs:range xsd:string .
+
+    ?dsQtdBenCess a qb:MeasureProperty;
+        rdfs:subPropertyOf sdmx-measure:obsValue;
+        rdfs:label "Quantidade de Benefícios Cessados"@pt;
+        rdfs:label "Number of benefits ceased"@en;
+        rdfs:range xsd:integer.
+
+    ?componente qb:measure ?dsQtdBenCess ;
+            qb:dimension sdmx-dimension:refPeriod ;
+            qb:dimension sdmx-dimension:sex ;
+            qb:dimension ?refClientela;
+            qb:dimension ?refTempoDuracao .
+
+    ?dsd a qb:DataStructureDefinition;
+        qb:component ?componente.
+
+    ?dataset a dcat:Dataset;
+        dcat:landingPage ?uri;
+        dcat:distribution ?csv;
+        rdfs:label "Benefícios cessados com motivo morte por duração"@pt;
+        rdfs:label "Benefits ceased because of death"@en;
+        rdfs:comment "Quantidade de benefícios cessados por faixas de duração do benefício, sexo do beneficiário, clientela e ano da data de cessação do benefício. Não inclui pensões alimentícias nem benefícios de prestação única. Considera desdobramentos de pensões por morte e apenas o motivo da cessação 'morte'."@pt ;
+        qb:structure ?dsd.
+
+    ?csv a dcat:Distribution;
+        dcat:downloadURL ?downuri;
+        dcat:mediaType "text/csv" .
+
+    ?row a qb:Observation ;
+        qb:dataSet ?dataset;
+        sdmx-dimension:refPeriod ?Ano ;
+        sdmx-dimension:sex ?genero;
+        ds:refTempoDuracao ?TempoDuracao ;
+        ds:refClientela ?Clientela ;
+        ds:QtdBenCess ?QtdBenCess .
+        
+} WHERE {
+    ?row j.1:Ano ?Ano ;
+        j.1:Tempo%20de%20Duração ?TempoDuracao;
+        j.1:Sexo ?Sexo;
+        j.1:Clientela ?Clientela ;
+        j.1:Quantidade%20Benefícios%20Cessados ?QtdBenCess .
+
+    BIND(IF(?Sexo="Masculino",sdmx-code:sex-M,sdmx-code:sex-F) AS ?genero)
+    BIND(URI("http://dados.gov.br/dataset/beneficios-cessados-com-motivo-morte-por-duracao")AS ?uri)
+    BIND(URI("http://dadosabertos.dataprev.gov.br/opendata/ces05/formato=csv")AS ?downuri)
+    BIND(URI("http://dados.gov.br/dataset/beneficios-cessados-com-motivo-morte-por-duracao#dsd")AS ?dsd)
+    BIND(URI("http://dados.gov.br/dataset/beneficios-cessados-com-motivo-morte-por-duracao#csv")AS ?csv)
+    BIND(URI("http://dados.gov.br/dataset/beneficios-cessados-com-motivo-morte-por-duracao#dataset")AS ?dataset)
+    BIND(URI("http://dados.gov.br/dataset/beneficios-cessados-com-motivo-morte-por-duracao#componente")AS ?componente)
+    BIND(URI(CONCAT("http://dados.gov.br/dataset/beneficios-cessados-com-motivo-morte-por-duracao#", "QtdBenCess"))  AS ?dsQtdBenCess)
+    BIND(URI(CONCAT("http://dados.gov.br/dataset/beneficios-cessados-com-motivo-morte-por-duracao#", "refClientela"))  AS ?refClientela)
+    BIND(URI(CONCAT("http://dados.gov.br/dataset/beneficios-cessados-com-motivo-morte-por-duracao#", "refTempoDuracao"))  AS ?refTempoDuracao)
+}

@@ -1,0 +1,81 @@
+PREFIX ds: <http://dados.gov.br/dataset/cgeo_vw_per_pessoas_amarela#> 
+PREFIX RDF: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> 
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX ibge: <https://metadados.ibge.gov.br/#> 
+PREFIX gn: <http://www.geonames.org/ontology#> 
+PREFIX ogc: <http://www.opengis.net/rdf#> 
+PREFIX j.0: <http://w3c/future-csv-vocab/> 
+PREFIX j.1: <file:///Users/amonrhaniery/eclipse-workspace/hierarquiaurbana/input/vw_per_pessoas_amarela.csv#>
+PREFIX sdmx-dimension: <http://purl.org/linked-data/sdmx/2009/dimension#>
+PREFIX sdmx-measure: <http://purl.org/linked-data/sdmx/2009/measure#>
+PREFIX sdmx-concept: <http://purl.org/linked-data/sdmx/2009/concept#>
+PREFIX qb: <http://purl.org/linked-data/cube#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
+CONSTRUCT {
+
+    ?refCidade a qb:DimensionProperty;
+        rdfs:subPropertyOf sdmx-dimension:refArea;
+        qb:concept sdmx-concept:refArea;
+        rdfs:range gn:P.
+
+    ?PERPessoasAmarela a qb:MeasureProperty;
+        rdfs:subPropertyOf sdmx-measure:obsValue;
+        rdfs:label "Percentual de pessoas residentes de cor ou raça Amarela"@pt;
+        rdfs:label "Percentage of people of color or race Yellow"@en;
+        rdfs:range xsd:decimal.
+
+    ?dsPessoas_Amarela a qb:MeasureProperty;
+        rdfs:subPropertyOf sdmx-measure:obsValue;
+        rdfs:label "Pessoas residentes de cor ou raça Amarela"@pt;
+        rdfs:label "Residents of color or race Yellow"@en;
+        rdfs:range xsd:decimal.
+
+    ?componente qb:measure ?PERPessoasAmarela ;
+         qb:measure ?dsPessoas_Amarela ;
+         qb:dimension sdmx-dimension:refPeriod ;
+          qb:dimension ?refCidade .
+
+    ?dsd a qb:DataStructureDefinition;
+        qb:component ?componente.
+
+    ?vw_per_pessoas_amarela a qb:DataSet;
+        rdfs:label "Pessoas de cor ou raça Amarela"@pt;
+        rdfs:label "People of color or race Yellow"@en;
+        rdfs:comment "Percentual de pessoas residentes pessoa que se declararam amarela (de origem japonesa, chinesa, coreana etc.) em relaçãoà população residente total, na data de referência do Censo Demográfico.Fonte: IBGE, Censo Demográfico 2010 e Malha municipal 2010."@pt ;
+        qb:structure ?dsd.
+
+    ?row a qb:Observation ;
+        ds:Pessoas_Amarela ?Pessoas_Amarela;
+        qb:dataSet ?vw_per_pessoas_amarela;
+        sdmx-dimension:refPeriod ?year ;
+        ds:PERPessoasAmarela ?PER_Pessoas_Amarela;
+        ds:refCidade ?city.
+        
+        ?city a ibge:Cidade;
+            a ogc:Polygon;
+            gn:name ?nome;
+            gn:population ?POP_TOT;
+            gn:parentADM1 ?UF;
+            ogc:awSKT ?the_geom2;
+            ibge:classePessoasAmarelas ?classe .
+        
+} WHERE {
+?row j.1:nome ?nome;
+    j.1:UF ?UF ;
+    j.1:POP_TOT ?POP_TOT ;
+    j.1:Pessoas_Amarela ?Pessoas_Amarela ;
+    j.1:PER_Pessoas_Amarela ?PER_Pessoas_Amarela ;
+    j.1:classe ?classe ;
+    j.1:geom ?the_geom .
+    BIND(STRDT(STR(?the_geom), <http://www.opengis.net/rdf#WKTLiteral>) AS ?the_geom2)
+    BIND(ENCODE_FOR_URI( STR( ?nome ) ) AS ?nome2)
+    BIND(URI(CONCAT("https://cidades.ibge.gov.br/#", STR( ?nome2 )))  AS ?city)
+    BIND(URI("http://dados.gov.br/dataset/cgeo_vw_per_pessoas_amarela#dsd") AS ?dsd)
+    BIND(URI("http://dados.gov.br/dataset/cgeo_vw_per_pessoas_amarela#componente") AS ?componente)
+    BIND(URI("http://dados.gov.br/dataset/cgeo_vw_per_pessoas_amarela") AS ?vw_per_pessoas_amarela)
+    BIND(URI(CONCAT("http://dados.gov.br/dataset/cgeo_vw_per_pessoas_amarela#", "classe"))  AS ?dsclasse)
+    BIND(URI(CONCAT("http://dados.gov.br/dataset/cgeo_vw_per_pessoas_amarela#", "Pessoas_Amarela"))  AS ?dsPessoas_Amarela)
+    BIND(URI(CONCAT("http://dados.gov.br/dataset/cgeo_vw_per_pessoas_amarela#", "PERPessoasAmarela"))  AS ?PERPessoasAmarela)
+    BIND(URI(CONCAT("http://dados.gov.br/dataset/cgeo_vw_per_pessoas_amarela#", "refCidade"))  AS ?refCidade)
+}

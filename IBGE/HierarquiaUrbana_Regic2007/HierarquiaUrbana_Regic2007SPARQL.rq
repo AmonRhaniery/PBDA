@@ -1,0 +1,177 @@
+PREFIX ibge: <https://metadados.ibge.gov.br/#>
+PREFIX spif: <http://spinrdf.org/spif#>
+PREFIX gn: <http://www.geonames.org/ontology#>
+PREFIX inde: <http://www.metadados.inde.gov.br/geonetwork/srv/por/xml_iso19115to19139?id=188826>
+PREFIX ogc: <http://www.opengis.net/rdf#>
+PREFIX ztwd: <http://zbw.eu/stw/version/latest/descriptor/19231-0/about>
+PREFIX j.0: <http://w3c/future-csv-vocab/>
+PREFIX j.1: <file:///Users/amonrhaniery/eclipse-workspace/hierarquiaurbana/input/HierarquiaUrbana_Regic2007.csv#>
+
+CONSTRUCT {
+	?row2 a ibge:Cidade ;
+        ibge:codmun ?codmun ;
+		ibge:codmundv ?codmundv ;
+		gn:parentADM1 ?uf ;
+		gn:name ?nome_mun ;
+		gn:population ?ric01 ;
+		ogc:spatialDimension ?ric02 ;
+		ztwd: ?ric03 ;
+		ibge:ric04 ?ric04 ;
+		ibge:ric05 ?ric05 ;
+		ibge:ric06 ?ric06 ;
+		ibge:ric07 ?ric07 ;
+		ibge:ric08 ?ric08 ;
+		ibge:ric09 ?ric09 ;
+		ibge:ric10 ?ric10 ;
+		ibge:ric11 ?ric11 ;
+		ibge:ric12 ?ric12 ;
+		ibge:ric13 ?ric13 ;
+		ibge:ric14 ?ric14 ;
+		ibge:ric15 ?ric15 ;
+		ibge:ric16 ?ric16 ;
+		ibge:ric17 ?ric17 ;
+		ibge:ric18 ?ric18 ;
+		ibge:ric19 ?ric19 ;
+		ibge:ric20 ?ric20 ;
+		ibge:ric21 ?ric21 ;
+		ibge:ric22 ?ric22 ;
+		ibge:ric23 ?ric23 ;
+		ibge:ric24 ?ric24 ;
+		ibge:ric25 ?ric25 ;
+		ibge:ric26 ?ric26 ;
+		ibge:ric27 ?ric27 ;
+		ibge:ric28 ?ric28 ;
+		ibge:ric29 ?ric29 ;
+		ibge:ric30 ?ric30 ;
+		ibge:ric31 ?ric31 ;
+		ibge:ric32 ?ric32 ;
+		ibge:ric33 ?ric33 ;
+		ibge:ric34 ?ric34 ;
+		ibge:ric35 ?ric35 ;
+		ibge:ric36 ?ric36 ;
+		ibge:ric37 ?ric37 ;
+		ibge:ric38 ?ric38 ;
+		ibge:ric39 ?ric39 ;
+		ibge:ric40 ?ric40 ;
+		ibge:ric41 ?ric41 ;
+		ibge:ric42 ?ric42 ;
+		ibge:ric43 ?ric43 ;
+		ibge:ric44 ?ric44 ;
+		ibge:ric45 ?ric45 ;
+		ibge:ric46 ?ric46 ;
+		ibge:ric47 ?ric47 ;
+		ibge:ric48 ?ric48 ;
+		ibge:ric49 ?ric49 ;
+		ibge:ric50 ?ric50 ;
+		ibge:ric51 ?ric51 ;
+		ibge:ric52 ?ric52 ;
+		ibge:ric53 ?ric53 ;
+		ibge:ric54 ?ric54 ;
+		ibge:ric55 ?ric55 ;
+		ibge:ric56 ?ric56 ;
+		ibge:ric57 ?ric57 ;
+		ibge:ric58 ?ric58 ;
+		ibge:ric59 ?ric59 ;
+		ibge:ric60 ?ric60 ;
+		ibge:ric61 ?ric61 ;
+		ibge:ric62 ?ric62 ;
+		ibge:ric63 ?ric63 ;
+		ibge:ric64 ?ric64 ;
+		ibge:ric65 ?ric65 ;
+		ibge:ric66 ?ric66 ;
+		ibge:ric67 ?ric67 ;
+		ibge:ric68 ?ric68 ;
+		ibge:ric69 ?ric69 ;
+		ibge:ric70 ?ric70 ;
+		ibge:ric71 ?ric71 ;
+		ibge:ric72 ?ric72 ;
+		ibge:ric73 ?ric73 ;
+		ibge:ric74 ?ric74 ;
+		ibge:ric75 ?ric75 ;
+    	ogc:asWKT ?the_geom2 ;
+    	a ogc:Point.
+} WHERE {
+    ?row j.1:codmun ?codmun ;
+		j.1:codmundv ?codmundv ;
+		j.1:uf ?uf ;
+		j.1:nome_mun ?nome_mun ;
+		j.1:ric01 ?ric01 ;
+		j.1:ric02 ?ric02 ;
+  		j.1:the_geom ?the_geom .
+		OPTIONAL { ?row j.1:ric03 ?ric03 } OPTIONAL { ?row 
+		j.1:ric04 ?ric04 } OPTIONAL { ?row 
+		j.1:ric05 ?ric05 } OPTIONAL { ?row 
+		j.1:ric06 ?ric06 } OPTIONAL { ?row 
+		j.1:ric07 ?ric07 } OPTIONAL { ?row 
+		j.1:ric08 ?ric08 } OPTIONAL { ?row 
+		j.1:ric09 ?ric09 } OPTIONAL { ?row 
+		j.1:ric10 ?ric10 } OPTIONAL { ?row 
+		j.1:ric11 ?ric11 } OPTIONAL { ?row 
+		j.1:ric12 ?ric12 } OPTIONAL { ?row 
+		j.1:ric13 ?ric13 } OPTIONAL { ?row 
+		j.1:ric14 ?ric14 } OPTIONAL { ?row 
+		j.1:ric15 ?ric15 } OPTIONAL { ?row 
+		j.1:ric16 ?ric16 } OPTIONAL { ?row 
+		j.1:ric17 ?ric17 } OPTIONAL { ?row 
+		j.1:ric18 ?ric18 } OPTIONAL { ?row 
+		j.1:ric19 ?ric19 } OPTIONAL { ?row 
+		j.1:ric20 ?ric20 } OPTIONAL { ?row 
+		j.1:ric21 ?ric21 } OPTIONAL { ?row 
+		j.1:ric22 ?ric22 } OPTIONAL { ?row 
+		j.1:ric23 ?ric23 } OPTIONAL { ?row 
+		j.1:ric24 ?ric24 } OPTIONAL { ?row 
+		j.1:ric25 ?ric25 } OPTIONAL { ?row 
+		j.1:ric26 ?ric26 } OPTIONAL { ?row 
+		j.1:ric27 ?ric27 } OPTIONAL { ?row 
+		j.1:ric28 ?ric28 } OPTIONAL { ?row 
+		j.1:ric29 ?ric29 } OPTIONAL { ?row 
+		j.1:ric30 ?ric30 } OPTIONAL { ?row 
+		j.1:ric31 ?ric31 } OPTIONAL { ?row 
+		j.1:ric32 ?ric32 } OPTIONAL { ?row 
+		j.1:ric33 ?ric33 } OPTIONAL { ?row 
+		j.1:ric34 ?ric34 } OPTIONAL { ?row 
+		j.1:ric35 ?ric35 } OPTIONAL { ?row 
+		j.1:ric36 ?ric36 } OPTIONAL { ?row 
+		j.1:ric37 ?ric37 } OPTIONAL { ?row 
+		j.1:ric38 ?ric38 } OPTIONAL { ?row 
+		j.1:ric39 ?ric39 } OPTIONAL { ?row 
+		j.1:ric40 ?ric40 } OPTIONAL { ?row 
+		j.1:ric41 ?ric41 } OPTIONAL { ?row 
+		j.1:ric42 ?ric42 } OPTIONAL { ?row 
+		j.1:ric43 ?ric43 } OPTIONAL { ?row 
+		j.1:ric44 ?ric44 } OPTIONAL { ?row 
+		j.1:ric45 ?ric45 } OPTIONAL { ?row 
+		j.1:ric46 ?ric46 } OPTIONAL { ?row 
+		j.1:ric47 ?ric47 } OPTIONAL { ?row 
+		j.1:ric48 ?ric48 } OPTIONAL { ?row 
+		j.1:ric49 ?ric49 } OPTIONAL { ?row 
+		j.1:ric50 ?ric50 } OPTIONAL { ?row 
+		j.1:ric51 ?ric51 } OPTIONAL { ?row 
+		j.1:ric52 ?ric52 } OPTIONAL { ?row 
+		j.1:ric53 ?ric53 } OPTIONAL { ?row 
+		j.1:ric54 ?ric54 } OPTIONAL { ?row 
+		j.1:ric55 ?ric55 } OPTIONAL { ?row 
+		j.1:ric56 ?ric56 } OPTIONAL { ?row 
+		j.1:ric57 ?ric57 } OPTIONAL { ?row 
+		j.1:ric58 ?ric58 } OPTIONAL { ?row 
+		j.1:ric59 ?ric59 } OPTIONAL { ?row 
+		j.1:ric60 ?ric60 } OPTIONAL { ?row 
+		j.1:ric61 ?ric61 } OPTIONAL { ?row 
+		j.1:ric62 ?ric62 } OPTIONAL { ?row 
+		j.1:ric63 ?ric63 } OPTIONAL { ?row 
+		j.1:ric64 ?ric64 } OPTIONAL { ?row 
+		j.1:ric65 ?ric65 } OPTIONAL { ?row 
+		j.1:ric66 ?ric66 } OPTIONAL { ?row 
+		j.1:ric67 ?ric67 } OPTIONAL { ?row 
+		j.1:ric68 ?ric68 } OPTIONAL { ?row 
+		j.1:ric69 ?ric69 } OPTIONAL { ?row 
+		j.1:ric70 ?ric70 } OPTIONAL { ?row 
+		j.1:ric71 ?ric71 } OPTIONAL { ?row 
+		j.1:ric72 ?ric72 } OPTIONAL { ?row 
+		j.1:ric73 ?ric73 } OPTIONAL { ?row 
+		j.1:ric74 ?ric74 } OPTIONAL { ?row 
+		j.1:ric75 ?ric75 }
+    BIND(STRDT(STR(?the_geom), <http://www.opengis.net/rdf#WKTLiteral>) AS ?the_geom2)
+    BIND(URI(CONCAT("https://cidades.ibge.gov.br/#", STR( ?codmun )))  AS ?row2)
+}
+

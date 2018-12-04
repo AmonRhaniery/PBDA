@@ -1,0 +1,94 @@
+PREFIX ds: <http://dados.gov.br/dataset/estatisticas-contrib-pessoas-fisicas-por-uf>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> 
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX gn: <http://www.geonames.org/ontology#> 
+PREFIX j.0: <http://w3c/future-csv-vocab/> 
+PREFIX j.1: <file:///Users/amonrhaniery/eclipse-workspace/hierarquiaurbana/input/CTB21.csv#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX sdmx-dimension: <http://purl.org/linked-data/sdmx/2009/dimension#>
+PREFIX sdmx-measure: <http://purl.org/linked-data/sdmx/2009/measure#>
+PREFIX sdmx-concept: <http://purl.org/linked-data/sdmx/2009/concept#>
+PREFIX qb: <http://purl.org/linked-data/cube#>
+PREFIX org: <http://www.w3.org/ns/org#>
+PREFIX vcard: <http://www.w3.org/2006/vcard/ns#>
+PREFIX dcat: <http://www.w3.org/ns/dcat#>
+
+CONSTRUCT {
+
+    ?refEstado a qb:DimensionProperty;
+        rdfs:subPropertyOf sdmx-dimension:refArea;
+        qb:concept sdmx-concept:refArea;
+        rdfs:range gn:A.
+
+    ?dsQtdContribuintes a qb:MeasureProperty;
+        rdfs:subPropertyOf sdmx-measure:obsValue;
+        rdfs:label "Quantidade de Contribuintes"@pt;
+        rdfs:label "Number of taxpayers"@en;
+        rdfs:range xsd:integer.
+
+    ?dsNumMedMensContr a qb:MeasureProperty;
+        rdfs:subPropertyOf sdmx-measure:obsValue;
+        rdfs:label "Número Médio Mensal Contribuído"@pt;
+        rdfs:label "Average monthly number contributed"@en;
+        rdfs:range xsd:decimal.
+
+    ?dsValorRem a qb:MeasureProperty;
+        rdfs:subPropertyOf sdmx-measure:obsValue;
+        rdfs:label "Valor das Remunerações"@pt;
+        rdfs:label "Value of remuneration"@en;
+        rdfs:range xsd:decimal.
+
+    ?componente qb:measure ?dsQtdContribuintes ;
+        qb:measure ?dsNumMedMensContr ;
+        qb:measure ?dsValorRem ;
+        qb:dimension sdmx-dimension:refPeriod ;
+        qb:dimension ?refEstado .
+
+    ?dsd a qb:DataStructureDefinition;
+        qb:component ?componente.
+
+    ?dataset a dcat:Dataset;
+        dcat:landingPage ?uri;
+        dcat:distribution ?csv;
+        rdfs:label "Estatísticas de Contrib. Pessoas Físicas por UF"@pt;
+        rdfs:label "Taxpayer statistics per state"@en;
+        rdfs:comment "Estatísticas de contribuintes pessoa física por UF de recolhimento/GFIP e ano da competência do recolhimento/GFIP. Dados obtidos da união das informações da Guia de Recolhimento do Fundo de Garantia do Tempo de Serviço e Informações à Previdência Social (GFIP) e da Guia da Previdência Social (GPS)."@pt ;
+        qb:structure ?dsd.
+
+    ?csv a dcat:Distribution;
+        dcat:downloadURL ?downuri;
+        dcat:mediaType "text/csv" .
+
+    ?UF a gn:A;
+        gn:name ?UnidadeDaFederacao.
+
+    ?row a qb:Observation ;
+        qb:dataSet ?dataset;
+        sdmx-dimension:refPeriod ?Ano ;
+        ds:refEstado ?UF ;
+        ds:QtdContr ?QtdContr ;
+        ds:NumMedMensContr ?NumMedMensContr;
+        ds:ValorRem ?ValorRem .
+
+        
+} WHERE {
+    ?row j.1:Ano ?Ano ;
+        j.1:Valor%20das%20Remunerações ?ValorRem ;
+        j.1:Unidade%20da%20Federação ?UnidadeDaFederacao;
+        j.1:Número%20Médio%20Mensal%20Contrib ?NumMedMensContr ;
+        j.1:Quantidade%20de%20Contribuintes ?QtdContr .
+
+    BIND(ENCODE_FOR_URI( STR( ?UnidadeDaFederacao) ) AS ?nome2)
+    BIND(URI("http://dados.gov.br/dataset/estatisticas-contrib-pessoas-fisicas-por-uf")AS ?uri)
+    BIND(URI("http://dados.gov.br/dataset/estatisticas-contrib-pessoas-fisicas-por-uf")AS ?dataset)
+    BIND(URI("http://dados.gov.br/dataset/estatisticas-contrib-pessoas-fisicas-por-uf#componente")AS ?componente)
+    BIND(URI("http://dados.gov.br/dataset/estatisticas-contrib-pessoas-fisicas-por-uf#dsd")AS ?dsd)
+    BIND(URI("http://dados.gov.br/dataset/estatisticas-contrib-pessoas-fisicas-por-uf#csv")AS ?csv)
+    BIND(URI("http://dadosabertos.dataprev.gov.br/opendata/ctb21/formato=csv")AS ?downuri)
+    BIND(URI(CONCAT("https://cidades.ibge.gov.br/#", STR( ?nome2 )))  AS ?UF)
+    BIND(URI(CONCAT("http://dados.gov.br/dataset/estatisticas-contrib-pessoas-fisicas-por-uf#", "ValorRem"))  AS ?dsValorRem)
+    BIND(URI(CONCAT("http://dados.gov.br/dataset/estatisticas-contrib-pessoas-fisicas-por-uf#", "NumMedMensContr"))  AS ?dsNumMedMensContr)
+    BIND(URI(CONCAT("http://dados.gov.br/dataset/estatisticas-contrib-pessoas-fisicas-por-uf#", "refEstado"))  AS ?refEstado)
+    BIND(URI(CONCAT("http://dados.gov.br/dataset/estatisticas-contrib-pessoas-fisicas-por-uf#", "QtdContr"))  AS ?dsQtdContribuintes)
+}

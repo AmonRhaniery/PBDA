@@ -1,0 +1,57 @@
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> 
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#> 
+PREFIX j.0: <http://w3c/future-csv-vocab/> 
+PREFIX j.1: <file:///Users/amonrhaniery/eclipse-workspace/hierarquiaurbana/input/orgao2018.csv#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX org: <http://www.w3.org/ns/org#>
+PREFIX vcard: <http://www.w3.org/2006/vcard/ns#>
+PREFIX dcat: <http://www.w3.org/ns/dcat#>
+PREFIX mil: <http://rdf.muninn-project.org/ontologies/military#>
+
+CONSTRUCT {
+
+    ?dataset a dcat:Dataset;
+        dcat:landingPage ?uri;
+        rdfs:comment "Denominam-se Organizações Militares (OM) as organizações do Exército Brasileiro que possuem denominação oficial, Quadro de Organização (QO), ou Quadro de Lotação de Pessoal Militar (QLPM) e Quadro de Distribuição de Efetivos (QDE), próprios. Na relação das Organizações Militares do Exército estão incluídas as seguintes informações: nome, sigla, logradouro, bairro, cidade, UF e CEP."@pt;
+        rdfs:label "Organizações Militares (OMs)"@pt ;
+        rdfs:label "Military Organizations"@en;
+        dcat:distribution ?csv.
+
+    ?csv a dcat:Distribution;
+        dcat:downloadURL ?downuri;
+        dcat:mediaType "text/csv" .
+
+    ?endereco vcard:region ?UF;
+        vcard:postal-code ?CEP;
+        vcard:locality ?CIDADE;
+        vcard:street-address ?enderecoTotal .
+
+     ?om a org:FormalOrganization ;
+        rdfs:seeAlso <http://www.sgex.eb.mil.br/sistemas/organograma/organograma_exercito.php>;
+        a vcard:Organization ;
+        a mil:MilitaryOrganization ;
+        vcard:organization-name ?NOME;
+        rdfs:comment "Organização Militar"@pt;
+        vcard:hasAddress ?endereco ;
+        org:identifier ?SIGLA.
+        
+} WHERE {
+    ?row j.1:NOME ?NOME ;
+        j.1:SIGLA ?SIGLA ;
+        j.1:LOGRADOURO ?LOGRADOURO;
+        j.1:UF ?UF ;
+        j.1:BAIRRO ?BAIRRO;
+        j.1:CIDADE ?CIDADE;
+        j.1:CEP ?CEP .
+    BIND(ENCODE_FOR_URI( STR( ?NOME) ) AS ?nome2)
+    BIND(CONCAT(STR(?LOGRADOURO)," ") AS ?Logradouro1)
+    BIND(CONCAT(STR(?Logradouro1),STR(?BAIRRO)) AS ?enderecoTotal)
+    BIND(BNODE() AS ?endereco)
+    BIND(URI("http://dados.gov.br/dataset/organizacao-militar")AS ?uri)
+    BIND(URI("http://dados.gov.br/dataset/organizacao-militar")AS ?dataset)
+    BIND(URI("http://dados.gov.br/dataset/organizacao-militar#csv")AS ?csv)
+    BIND(URI("http://dadosabertos.eb.mil.br/arquivos/organizacao-militar/orgao2018.csv")AS ?downuri)
+    BIND(URI(CONCAT("http://www.eb.mil.br/acesso-a-informacao/estrutura-organizacional#", STR( ?nome2 )))  AS ?om)
+    
+}

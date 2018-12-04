@@ -1,0 +1,58 @@
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> 
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#> 
+PREFIX j.0: <http://w3c/future-csv-vocab/> 
+PREFIX j.1: <file:///Users/amonrhaniery/eclipse-workspace/hierarquiaurbana/input/jsm2018.csv#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX org: <http://www.w3.org/ns/org#>
+PREFIX vcard: <http://www.w3.org/2006/vcard/ns#>
+PREFIX dcat: <http://www.w3.org/ns/dcat#>
+PREFIX mil: <http://rdf.muninn-project.org/ontologies/military#>
+
+CONSTRUCT {
+
+    ?dataset a dcat:Dataset;
+        dcat:landingPage ?uri;
+        rdfs:comment "Dados dos cidadãos brasileiros residentes no Brasil e no exterior que se alistaram no Serviço Militar Obrigatório de 2007 a 2017 e relação das Juntas de Serviço Militar (JSM). Estão incluídas em todas as tabelas de dados do Serviço Militar as seguintes informações: ano de nascimento, peso, altura , tamanho da cabeça, número do calçado, tamanho da cintura, religião, município, UF e país de nascimento, estado civil, sexo, escolaridade, ano de alistamento, se foi dispensado ou não, zona residencial, município, uf e país de residência, junta, município e UF da junta. Estão incluídas na tabela de dados das JSM as seguintes informações: código, nome, endereço, bairro, CEP, telefone, município e UF."@pt;
+        rdfs:label "Juntas do Serviço Militar"@pt ;
+        rdfs:label "Military Service Junta"@en;
+        dcat:distribution ?csv.
+
+    ?csv a dcat:Distribution;
+        dcat:downloadURL ?downuri;
+        dcat:mediaType "text/csv" .
+
+    ?endereco vcard:region ?UF_JSM;
+        vcard:postal-code ?CEP;
+        vcard:locality ?MUNICIPIO_JSM;
+        vcard:street-address ?enderecoTotal .
+
+     ?jsm a org:FormalOrganization ;
+        rdfs:seeAlso <https://www.alistamento.eb.mil.br/services/jsm!input.action>;
+        a vcard:Organization ;
+        vcard:organization-name ?JSM;
+        vcard:hasTelephone ?TELEFONE;
+        rdfs:comment "Junta Militar"@pt;
+        vcard:hasAddress ?endereco ;
+        org:identifier ?SIGLA.
+        
+} WHERE {
+    ?row j.1:JSM ?JSM ;
+        j.1:ENDERECO ?ENDERECO ;
+        j.1:BAIRRO ?BAIRRO;
+        j.1:CEP ?CEP ;
+        j.1:TELEFONE ?TELEFONE;
+        j.1:MUNICIPIO_JSM ?MUNICIPIO_JSM;
+        j.1:UF_JSM ?UF_JSM.
+
+    BIND(ENCODE_FOR_URI( STR( ?JSM) ) AS ?nome2)
+    BIND(CONCAT(STR(?ENDERECO)," ") AS ?Logradouro1)
+    BIND(CONCAT(STR(?Logradouro1),STR(?BAIRRO)) AS ?enderecoTotal)
+    BIND(URI("http://dados.gov.br/dataset/servico-militar")AS ?uri)
+        BIND(URI("http://dados.gov.br/dataset/servico-militar")AS ?dataset)
+    BIND(URI("http://dados.gov.br/dataset/servico-militar#csv")AS ?csv)
+    BIND(BNODE() AS ?endereco)
+    BIND(URI("http://dadosabertos.eb.mil.br/arquivos/organizacao-militar/orgao2018.csv")AS ?downuri)
+    BIND(URI(CONCAT("https://www.alistamento.eb.mil.br/#", STR( ?nome2 )))  AS ?jsm)
+    
+}
